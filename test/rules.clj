@@ -1,0 +1,96 @@
+(ns rules
+  (:use cssgen clojure.test))
+
+(deftest single-prop-rules
+  (are [the-rule css] (= css (rule-css the-rule))
+    
+(rule "a"
+      (prop :color "#aaa"))
+"a {
+  color: #aaa;
+}
+"
+
+(rule "div.klass#id, tr > td"
+  (prop :color "#aaa"))
+"div.klass#id, tr > td {
+  color: #aaa;
+}
+"))
+
+(deftest multiple-prop-rules
+  (are [the-rule css] (= css (rule-css the-rule))
+
+(rule "a"
+  (prop :color "#aaa")
+  (prop :background-color "#fff"))
+"a {
+  color: #aaa;
+  background-color: #fff;
+}
+"
+
+(rule "a"
+  (prop :color "#aaa" :background-color "#fff"))
+"a {
+  color: #aaa;
+  background-color: #fff;
+}
+"))
+
+(deftest nested-rule
+  (are [the-rule css] (= css (rule-css the-rule))
+
+(rule "tr"
+  (prop :background-color "#fff")
+  (rule "td"
+    (prop :color "black")))
+"tr {
+  background-color: #fff;
+}
+tr td {
+  color: black;
+}
+"
+
+(rule "tr"
+  (prop :background-color "#fff" :color "black")
+  (rule "td"
+    (prop :color "red")
+    (prop :width "50%")))
+"tr {
+  background-color: #fff;
+  color: black;
+}
+tr td {
+  color: red;
+  width: 50%;
+}
+"))
+
+(def prop1
+  (prop :color "#fff" :background-color "black"))
+
+(def prop2
+  (prop :width "100%" :display "block"))
+
+(def prop3
+  (prop :height "100px"))
+
+(deftest inner-prop
+  (are [the-rule css] (= css (rule-css the-rule))
+(rule "tr"
+  (prop :padding 0 prop1)
+  (prop prop2 prop3)
+  (prop :border "none"))
+"tr {
+  padding: 0;
+  color: #fff;
+  background-color: black;
+  width: 100%;
+  display: block;
+  height: 100px;
+  border: none;
+}
+"))
+
