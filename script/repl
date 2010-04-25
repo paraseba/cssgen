@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+CLASSPATH=`lein classpath`
+rlwrap java -Xmx1G -cp $CLASSPATH clojure.main -i script/config_repl.clj -r
+
