@@ -4,27 +4,30 @@
                              [seq :as sq]
                              [io :as io])))
 
+(defmulti add-rule-item #(:tag %2))
+
+(defmethod add-rule-item ::Prop [parent {prop :prop}]
+  (merge-with concat parent {:prop prop}))
+
+(defmethod add-rule-item ::Rule [parent rule]
+  (merge-with conj parent {:children rule}))
+
+(defmethod add-rule-item ::Mixin [parent {components :components}]
+  (reduce add-rule-item parent components))
+
 (defn prop [& forms]
   (letfn [(expand-item [item]
             (if (map? item)
               (sq/flatten (:prop item))
               [item]))]
     (let [expanded (mapcat expand-item forms)]
-      {:prop (apply vector (partition 2 expanded))})))
-
-(defmulti add-rule-item #(:selector %2))
-
-(defmethod add-rule-item nil
-  [parent new-prop]
-  (merge-with concat parent new-prop))
-
-(defmethod add-rule-item :default
-  [parent rule]
-  (merge-with conj parent {:children rule}))
+      {:tag ::Prop :prop (apply vector (partition 2 expanded))})))
 
 (defn rule [selector & forms]
-  (reduce add-rule-item {:selector selector, :children nil} forms))
+  (reduce add-rule-item {:tag ::Rule :selector selector :children nil} forms))
 
+(defn mixin [& forms]
+  {:tag ::Mixin :components (vec forms)})
 
 (defn rule-css [rule]
   (letfn [(format-prop [props]
@@ -43,18 +46,11 @@
               (s/join ", " (for [p parents c children]
                              (nest-single-selector (s/trim p) (s/trim c))))))
 
-          (child-rule-css [rule parent-selector]
-            (let [selector (:selector rule)
-                  children (:children rule)
-                  nested-selector (nest-selector parent-selector selector)
-                  parent-css (strint/<<
-"~{nested-selector} {
-~(format-prop (:prop rule))
-}
-")
+          (child-rule-css [{:keys (selector children prop)} parent-selector]
+            (let [nested-selector (nest-selector parent-selector selector)
+                  parent-css (strint/<< "~{nested-selector} {\n~(format-prop prop)\n}\n")
                   children-css (s/join "\n" (map #(child-rule-css % nested-selector) children))]
               (str parent-css children-css)))]
-                 
 
     (child-rule-css rule nil)))
 

@@ -3,7 +3,7 @@
 
 (deftest single-prop-rules
   (are [the-rule css] (= css (rule-css the-rule))
-    
+
 (rule "a"
       (prop :color "#aaa"))
 "a {
@@ -42,9 +42,9 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "tr"
-  (prop :background-color "#fff")
+  (prop "background-color" "#fff")
   (rule "td"
-    (prop :color "black")))
+    (prop "color" "black")))
 "tr {
   background-color: #fff;
 }
@@ -94,3 +94,20 @@ tr td {
 }
 "))
 
+(defn mixin1 []
+  (mixin
+    (prop :padding 0)
+    (rule "a"
+      (prop :color :blue))))
+
+(deftest multiple-rules-and-props
+  (are [the-rule css] (= css (rule-css the-rule))
+(rule ".block, .group"
+  (mixin1))
+".block, .group {
+  padding: 0;
+}
+.block a, .group a {
+  color: blue;
+}
+"))
