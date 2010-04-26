@@ -34,7 +34,7 @@ Installation
 
 The easiest way to install cssgen is by using Leiningen. Just add the following dependency to your project.clj file:
 
-  [cssgen "0.1.0"]
+    [cssgen "0.1.0"]
 
 Usage
 =====
@@ -43,67 +43,73 @@ I'll show some examples of use:
 
 * CSS properties (we will have more syntactic sugar soon):
   
-  (prop :border :none
-        :color "#fff"
-        :padding 0)
+        (prop
+          :border :none
+          :color "#fff"
+          :padding 0)
 
 * You can nest calls to `prop` like in:
 
-  (def nice-border
-    (prop :border-style :solid
-          :border-color "#98bf21"))
-
-  (prop :background-color :white
-        nice-border)
+        (def nice-border
+          (prop :border-style :solid
+                :border-color "#98bf21"))
+        
+        (prop :background-color :white
+              nice-border)
 
 * CSS rules:
 
-  (rule ".cell, .block"
-    (prop :display :block)
-    nice-border)
+        (rule ".cell, .block"
+          (prop :display :block)
+          nice-border)
 
 * You can nest rules:
 
-  (rule ".cell, .block"
-    (prop :display :block)
-    nice-border
-
-    (rule "a"   ; this will generate a rule for ".cell a, .block a"
-      (prop :color :blue)))
+        (rule ".cell, .block"
+          (prop :display :block)
+          nice-border
+          
+          (rule "a"   ; this will generate a rule for ".cell a, .block a"
+            (prop :color :blue)))
 
 * If you need the parent selector on the nested rule, you can use "&" and it will get replaced:
 
-  (rule "a"
-    (prop :color "#00C")
-    (rule "&:hover"
-      (prop :color "#0CC")))
+        (rule "a"
+          (prop :color "#00C")
+          
+          (rule "&:hover"
+            (prop :color "#0CC")))
 
 * You can declare mixins with multiple rules and properties:
 
-  (defn link-colors
-    ([normal] (link-colors normal nil))
-    ([normal hover] (link-colors normal hover nil))
-    ([normal hover active] (link-colors normal hover active nil))
-    ([normal hover active visited] (link-colors normal hover active visited nil))
-    ([normal hover active visited focus]
-      (mixin
-        (prop :color normal)
-        (if visited (rule "&:visited" (prop :color visited)))
-        (if focus (rule "&:focus" (prop :color focus)))
-        (if hover (rule "&:hover" (prop :color hover)))
-        (if active (rule "&:active" (prop :color active))))))
+        (defn link-colors
+          ([normal] (link-colors normal nil))
+          ([normal hover] (link-colors normal hover nil))
+          ([normal hover active] (link-colors normal hover active nil))
+          ([normal hover active visited] (link-colors normal hover active visited nil))
+          ([normal hover active visited focus]
+            (mixin
+              (prop :color normal)
+              (if visited (rule "&:visited" (prop :color visited)))
+              (if focus (rule "&:focus" (prop :color focus)))
+              (if hover (rule "&:hover" (prop :color hover)))
+              (if active (rule "&:active" (prop :color active))))))
+         
+        (rule "a"
+          (link-colors "#00c" "#0cc" "#c0c" "#ccc"))
+
 
 * `mixin` is just a way to group properties and rules, you don't need it if you are returning just one rule or set of
 properties.
     
 * To generate a new CSS file from the current clj code do:
   
-  (ns my-ns
-    (:use cssgen))
-
-  (css-file "public/css/screen.css"  ;this is the path of the target CSS file
-    (rule ".hidden"
-      (prop :display :none)))
+        (ns my-ns
+          (:use cssgen))
+         
+        (css-file "public/css/screen.css"  ;this is the path of the target CSS file
+          (rule ".hidden"
+            (prop :display :none)))
 
 
 ToDo
