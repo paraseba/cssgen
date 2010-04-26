@@ -111,3 +111,17 @@ tr td {
   color: blue;
 }
 "))
+
+(deftest mixin-with-nil
+  (are [the-rule css] (= css (rule-css the-rule))
+(rule "a"
+  (mixin
+    (prop :color "blue")
+    nil
+    (prop :font-size "60%")))
+"a {
+  color: blue;
+  font-size: 60%;
+}
+"))
+

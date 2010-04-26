@@ -27,7 +27,8 @@
   (reduce add-rule-item {:tag ::Rule :selector selector :children nil} forms))
 
 (defn mixin [& forms]
-  {:tag ::Mixin :components (vec forms)})
+  (let [filtered (filter (complement nil?) forms)]
+    {:tag ::Mixin :components (vec filtered)}))
 
 (defn rule-css [rule]
   (letfn [(format-prop [props]
