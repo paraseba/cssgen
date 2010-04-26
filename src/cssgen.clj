@@ -43,15 +43,19 @@
 
           (nest-selector [parent child]
             (let [parents (s/split #"," (or parent ""))
-                  children (s/split #"," child)]
+                  children (s/split #"," (or child ""))]
               (s/join ", " (for [p parents c children]
                              (nest-single-selector (s/trim p) (s/trim c))))))
 
-          (child-rule-css [{:keys (selector children prop)} parent-selector]
+          (child-rule-css [{:keys (tag selector children components prop)} parent-selector]
             (let [nested-selector (nest-selector parent-selector selector)
                   parent-css (strint/<< "~{nested-selector} {\n~(format-prop prop)\n}\n")
+                  children (or children components)
                   children-css (s/join "\n" (map #(child-rule-css % nested-selector) children))]
-              (str parent-css children-css)))]
+              (case tag
+                ::Rule (str parent-css children-css)
+                ::Mixin children-css
+                (throw (Exception. "Can only render rules or mixins")))))]
 
     (child-rule-css rule nil)))
 
