@@ -14,6 +14,9 @@
 (defmethod add-rule-item ::Mixin [parent {components :components}]
   (reduce add-rule-item parent components))
 
+(defmethod add-rule-item nil [parent _]
+  parent)
+
 
 (defprotocol Value
   (repr [x]))
@@ -65,30 +68,6 @@
 ;      (make-value mag unit)))
 
 
-;(defprotocol ProcessProperty
-;  (process-property [x]))
-
-;(extend-protocol ProcessProperty
-;  clojure.lang.IPersistentMap
-;    (process-property [m] (:prop m))
-
-;  clojure.lang.IPersistentVector
-;    (process-property [v] [(map process-property v)])
-
-;  clojure.lang.Keyword
-;    (process-property [k] k)
-;   
-;  clojure.lang.Symbol
-;    (process-property [s] (symbol->value s))
-
-;  Object
-;    (process-property [o] o))
-
-
-
-
-
-
 (defn prop [& forms]
   (letfn [(expand-item [item]
             (if (map? item)
@@ -98,12 +77,22 @@
           in-pairs (apply vector (partition 2 expanded))]
         {:tag ::Prop :prop in-pairs})))
 
+(defn- create-props [forms]
+  (letfn [(is-obj? [x] (or (map? x) (nil? x)))]
+    (let [parts (partition-by is-obj? forms)]
+      (mapcat #(if (is-obj? (first %))
+                 %
+                 [(apply prop %)])
+              parts))))
+
 (defn rule [selector & forms]
-  (reduce add-rule-item {:tag ::Rule :selector selector :children nil} forms))
+  (reduce add-rule-item
+          {:tag ::Rule :selector selector :children nil}
+          (create-props forms)))
+
 
 (defn mixin [& forms]
-  (let [filtered (filter (complement nil?) forms)]
-    {:tag ::Mixin :components (vec filtered)}))
+  {:tag ::Mixin :components (vec (create-props forms))})
 
 (defn rule-css [rule]
   (letfn [(format-prop [prop]

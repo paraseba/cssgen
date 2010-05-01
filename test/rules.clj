@@ -12,7 +12,7 @@
 "
 
 (rule "div.klass#id, tr > td"
-  (prop :padding [:1px :2px :5.5em :-3.3cm]))
+  :padding [:1px :2px :5.5em :-3.3cm])
 "div.klass#id, tr > td {
   padding: 1px 2px 5.5em -3.3cm;
 }
@@ -22,8 +22,8 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "a"
-  (prop :color :#aaa)
-  (prop :background-color :#fafbfc))
+  :color "#aaa"
+  :background-color :#fafbfc)
 "a {
   color: #aaa;
   background-color: #fafbfc;
@@ -31,7 +31,7 @@
 "
 
 (rule "a"
-  (prop :color :#aaa :background-color :#fff))
+  :color :#aaa :background-color :#fff)
 "a {
   color: #aaa;
   background-color: #fff;
@@ -42,9 +42,9 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "tr"
-  (prop "background-color" :#fff)
+  :background-color :#fff
   (rule "td"
-    (prop "color" "black")))
+    :color "black"))
 "tr {
   background-color: #fff;
 }
@@ -54,11 +54,11 @@ tr td {
 "
 
 (rule "tr"
-  (prop :background-color :#fff
-        :color "black")
+  :background-color :#fff
+  :color "black"
   (rule "td"
-    (prop :color "red")
-    (prop :width "50%")))
+    :color "red"
+    :width "50%"))
 "tr {
   background-color: #fff;
   color: black;
@@ -83,9 +83,9 @@ tr td {
 (deftest inner-prop
   (are [the-rule css] (= css (rule-css the-rule))
 (rule "tr"
-  (prop :padding 0 prop1)
-  (prop prop2 prop3)
-  (prop :border "none"))
+  :padding 0 prop1
+  prop2 prop3
+  :border "none")
 "tr {
   padding: 0;
   color: #fff;
@@ -99,9 +99,9 @@ tr td {
 
 (defn mixin1 []
   (mixin
-    (prop :padding 0)
+    :padding 0
     (rule "a"
-      (prop :color :blue))))
+      :color :blue)))
 
 (deftest multiple-rules-and-props
   (are [the-rule css] (= css (rule-css the-rule))
@@ -119,9 +119,9 @@ tr td {
   (are [the-rule css] (= css (rule-css the-rule))
 (rule "a"
   (mixin
-    (prop :color "blue")
+    :color "blue"
     nil
-    (prop :font-size :2mm)))
+    :font-size :2mm))
 "a {
   color: blue;
   font-size: 2mm;
