@@ -23,11 +23,11 @@
 
 (defrecord Length [mag unit]
   Value
-  (repr [_] (str mag (s/as-str unit))))
-           
+  (repr [_] (str (s/as-str mag) (s/as-str unit))))
+
 (defrecord Color [r g b]
   Value
-  (repr [_] (str "#" (s/map-str #(Integer/toHexString %) [r g b]))))
+  (repr [_] (format "#%02X%02X%02X" r g b)))
 
 (extend-protocol Value
   nil
@@ -46,41 +46,65 @@
     (repr [i] (.toString i)))
 
 
-(defn- str->color [s]
-  (letfn [(extend [s] (.substring (str s s) 0 2))]
-    (let [s (if (= (.length s) 3)
-              (apply str (interleave s s))
-              s)
-          components (re-seq #".." s)
-          [r g b] (map #(-> % s/as-str extend (Integer/parseInt 16)) components)]
+(defn str->color [s]
+  (letfn [(remove-number-sign [s] (s/replace-first-re #"#" "" s))
+          (duplicate [s] (if (= (.length s) 3) (apply str (interleave s s)) s))]
+    (let [components (->> s remove-number-sign duplicate (re-seq #".."))
+          [r g b] (map #(Integer/parseInt % 16) components)]
 
       (Color. r g b))))
 
 
-(defn- make-value [mag unit]
-  (if (= unit "$")
-    (str->color mag)
+(defn make-value [mag unit]
+  (if (= (s/as-str unit) "$")
+    (str->color (s/as-str mag))
     (Length. mag unit)))
 
+(defmacro def-value-constr [name]
+  `(defn ~name [x#] (make-value x# ~(keyword name))))
 
-;(defn- symbol->value [sym]
-;  (let [[_ unit mag] (s/partition #"em|ex|px|in|cm|mm|pt|pc|%|\$" (name sym))]
-;      (make-value mag unit)))
+(def-value-constr em)
+(def-value-constr ex)
+(def-value-constr px)
+(def-value-constr in)
+(def-value-constr cm)
+(def-value-constr mm)
+(def-value-constr pt)
+(def-value-constr pc)
+(def-value-constr %)
+(def-value-constr $)
+(defn col [x] ($ x))
 
+;(defmacro $ [code]
+;  `(make-value ~(s/as-str code) :$))
+
+;(defmacro col [code]
+;  `($ ~code))
+
+
+(defn is-obj? [x]
+  ;I'm using this function in a partition-by, it's important that it
+  ;always returs false or nil, but not both
+  (boolean (and (map? x)
+                (if-let [t (:tag x)]
+                  (or (= t ::Prop)
+                      (= t ::Rule)
+                      (= t ::Mixin))))))
 
 (defn prop [& forms]
   (letfn [(expand-item [item]
-            (if (map? item)
+            (if (is-obj? item)
               (flatten (:prop item))
               [item]))]
     (let [expanded (mapcat expand-item forms)
           in-pairs (apply vector (partition 2 expanded))]
         {:tag ::Prop :prop in-pairs})))
 
-(defn- create-props [forms]
-  (letfn [(is-obj? [x] (or (map? x) (nil? x)))]
-    (let [parts (partition-by is-obj? forms)]
-      (mapcat #(if (is-obj? (first %))
+
+(defn create-props [forms]
+  (letfn [(ready? [x] (or (nil? x) (is-obj? x)))]
+    (let [parts (partition-by ready? forms)]
+      (mapcat #(if (ready? (first %))
                  %
                  [(apply prop %)])
               parts))))

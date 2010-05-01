@@ -11,6 +11,20 @@
 }
 "
 
+(rule "a"
+      (prop :color "#aaa"))
+"a {
+  color: #aaa;
+}
+"
+
+(rule "a"
+      (prop :color ($ :aaa)))
+"a {
+  color: #AAAAAA;
+}
+"
+
 (rule "div.klass#id, tr > td"
   :padding [:1px :2px :5.5em :-3.3cm])
 "div.klass#id, tr > td {
@@ -31,10 +45,10 @@
 "
 
 (rule "a"
-  :color :#aaa :background-color :#fff)
+  :color :#aaa :background-color (col "fff"))
 "a {
   color: #aaa;
-  background-color: #fff;
+  background-color: #FFFFFF;
 }
 "))
 
