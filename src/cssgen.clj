@@ -22,6 +22,10 @@
   Value
   (repr [_] (str mag (s/as-str unit))))
            
+(defrecord Color [r g b]
+  Value
+  (repr [_] (str "#" (s/map-str #(Integer/toHexString %) [r g b]))))
+
 (extend-protocol Value
   nil
     (repr [_] "")
@@ -36,13 +40,26 @@
     (repr [i] (.toString i)))
 
 
-(defn make-length [mag unit]
-  (Length. mag unit))
+(defn- str->color [s]
+  (letfn [(extend [s] (.substring (str s s) 0 2))]
+    (let [s (if (= (.length s) 3)
+              (apply str (interleave s s))
+              s)
+          components (re-seq #".." s)
+          [r g b] (map #(-> % s/as-str extend (Integer/parseInt 16)) components)]
+
+      (Color. r g b))))
 
 
-(defn symbol->value [sym]
-  (let [[_ unit mag] (s/partition #"em|ex|px|in|cm|mm|pt|pc|%" (name sym))]
-      (make-length mag unit)))
+(defn- make-value [mag unit]
+  (if (= unit "$")
+    (str->color mag)
+    (Length. mag unit)))
+
+
+(defn- symbol->value [sym]
+  (let [[_ unit mag] (s/partition #"em|ex|px|in|cm|mm|pt|pc|%|\$" (name sym))]
+      (make-value mag unit)))
 
 
 (defprotocol ProcessProperty
@@ -63,7 +80,6 @@
 
   Object
     (process-property [o] o))
-
 
 
 

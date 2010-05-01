@@ -5,9 +5,9 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "a"
-      (prop [:color "#aaa"]))
+      (prop [:color '$aaa]))
 "a {
-  color: #aaa;
+  color: #aaaaaa;
 }
 "
 
@@ -22,19 +22,19 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "a"
-  (prop [:color "#aaa"])
-  (prop [:background-color "#fff"]))
+  (prop [:color '$aaa])
+  (prop [:background-color '$fafbfc]))
 "a {
-  color: #aaa;
-  background-color: #fff;
+  color: #aaaaaa;
+  background-color: #fafbfc;
 }
 "
 
 (rule "a"
-  (prop [:color "#aaa"] [:background-color "#fff"]))
+  (prop [:color '$aaa] [:background-color '$fff]))
 "a {
-  color: #aaa;
-  background-color: #fff;
+  color: #aaaaaa;
+  background-color: #ffffff;
 }
 "))
 
@@ -42,11 +42,11 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "tr"
-  (prop ["background-color" "#fff"])
+  (prop ["background-color" '$fff])
   (rule "td"
     (prop ["color" "black"])))
 "tr {
-  background-color: #fff;
+  background-color: #ffffff;
 }
 tr td {
   color: black;
@@ -54,13 +54,13 @@ tr td {
 "
 
 (rule "tr"
-  (prop [:background-color "#fff"]
+  (prop [:background-color '$fff]
         [:color "black"])
   (rule "td"
     (prop [:color "red"])
     (prop [:width '%50])))
 "tr {
-  background-color: #fff;
+  background-color: #ffffff;
   color: black;
 }
 tr td {
@@ -70,7 +70,7 @@ tr td {
 "))
 
 (def prop1
-  (prop [:color "#fff"]
+  (prop [:color '$fff]
         [:background-color "black"]))
 
 (def prop2
@@ -88,7 +88,7 @@ tr td {
   (prop [:border "none"]))
 "tr {
   padding: 0;
-  color: #fff;
+  color: #ffffff;
   background-color: black;
   width: 100%;
   display: block;
