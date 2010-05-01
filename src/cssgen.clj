@@ -30,6 +30,9 @@
   nil
     (repr [_] "")
 
+  clojure.lang.IPersistentVector
+    (repr [v] (s/join " " (map repr v)))
+
   clojure.lang.Keyword
     (repr [k] (name k))
 
@@ -57,29 +60,29 @@
     (Length. mag unit)))
 
 
-(defn- symbol->value [sym]
-  (let [[_ unit mag] (s/partition #"em|ex|px|in|cm|mm|pt|pc|%|\$" (name sym))]
-      (make-value mag unit)))
+;(defn- symbol->value [sym]
+;  (let [[_ unit mag] (s/partition #"em|ex|px|in|cm|mm|pt|pc|%|\$" (name sym))]
+;      (make-value mag unit)))
 
 
-(defprotocol ProcessProperty
-  (process-property [x]))
+;(defprotocol ProcessProperty
+;  (process-property [x]))
 
-(extend-protocol ProcessProperty
-  clojure.lang.IPersistentMap
-    (process-property [m] (:prop m))
+;(extend-protocol ProcessProperty
+;  clojure.lang.IPersistentMap
+;    (process-property [m] (:prop m))
 
-  clojure.lang.IPersistentVector
-    (process-property [v] [(map process-property v)])
+;  clojure.lang.IPersistentVector
+;    (process-property [v] [(map process-property v)])
 
-  clojure.lang.Keyword
-    (process-property [k] k)
-   
-  clojure.lang.Symbol
-    (process-property [s] (symbol->value s))
+;  clojure.lang.Keyword
+;    (process-property [k] k)
+;   
+;  clojure.lang.Symbol
+;    (process-property [s] (symbol->value s))
 
-  Object
-    (process-property [o] o))
+;  Object
+;    (process-property [o] o))
 
 
 
@@ -87,7 +90,13 @@
 
 
 (defn prop [& forms]
-  {:tag ::Prop :prop (mapcat process-property forms)})
+  (letfn [(expand-item [item]
+            (if (map? item)
+              (flatten (:prop item))
+              [item]))]
+    (let [expanded (mapcat expand-item forms)
+          in-pairs (apply vector (partition 2 expanded))]
+        {:tag ::Prop :prop in-pairs})))
 
 (defn rule [selector & forms]
   (reduce add-rule-item {:tag ::Rule :selector selector :children nil} forms))
