@@ -5,16 +5,16 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "a"
-      (prop :color "#aaa"))
+      (prop [:color "#aaa"]))
 "a {
   color: #aaa;
 }
 "
 
 (rule "div.klass#id, tr > td"
-  (prop :color "#aaa"))
+  (prop [:padding 'px1 'px2 'em5.5 'cm-3.3]))
 "div.klass#id, tr > td {
-  color: #aaa;
+  padding: 1px 2px 5.5em -3.3cm;
 }
 "))
 
@@ -22,8 +22,8 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "a"
-  (prop :color "#aaa")
-  (prop :background-color "#fff"))
+  (prop [:color "#aaa"])
+  (prop [:background-color "#fff"]))
 "a {
   color: #aaa;
   background-color: #fff;
@@ -31,7 +31,7 @@
 "
 
 (rule "a"
-  (prop :color "#aaa" :background-color "#fff"))
+  (prop [:color "#aaa"] [:background-color "#fff"]))
 "a {
   color: #aaa;
   background-color: #fff;
@@ -42,9 +42,9 @@
   (are [the-rule css] (= css (rule-css the-rule))
 
 (rule "tr"
-  (prop "background-color" "#fff")
+  (prop ["background-color" "#fff"])
   (rule "td"
-    (prop "color" "black")))
+    (prop ["color" "black"])))
 "tr {
   background-color: #fff;
 }
@@ -54,10 +54,11 @@ tr td {
 "
 
 (rule "tr"
-  (prop :background-color "#fff" :color "black")
+  (prop [:background-color "#fff"]
+        [:color "black"])
   (rule "td"
-    (prop :color "red")
-    (prop :width "50%")))
+    (prop [:color "red"])
+    (prop [:width '%50])))
 "tr {
   background-color: #fff;
   color: black;
@@ -69,20 +70,22 @@ tr td {
 "))
 
 (def prop1
-  (prop :color "#fff" :background-color "black"))
+  (prop [:color "#fff"]
+        [:background-color "black"]))
 
 (def prop2
-  (prop :width "100%" :display "block"))
+  (prop [:width '%100]
+        [:display "block"]))
 
 (def prop3
-  (prop :height "100px"))
+  (prop [:height 'px100]))
 
 (deftest inner-prop
   (are [the-rule css] (= css (rule-css the-rule))
 (rule "tr"
-  (prop :padding 0 prop1)
+  (prop [:padding 0] prop1)
   (prop prop2 prop3)
-  (prop :border "none"))
+  (prop [:border "none"]))
 "tr {
   padding: 0;
   color: #fff;
@@ -96,9 +99,9 @@ tr td {
 
 (defn mixin1 []
   (mixin
-    (prop :padding 0)
+    (prop [:padding 0])
     (rule "a"
-      (prop :color :blue))))
+      (prop [:color :blue]))))
 
 (deftest multiple-rules-and-props
   (are [the-rule css] (= css (rule-css the-rule))
@@ -116,12 +119,12 @@ tr td {
   (are [the-rule css] (= css (rule-css the-rule))
 (rule "a"
   (mixin
-    (prop :color "blue")
+    (prop [:color "blue"])
     nil
-    (prop :font-size "60%")))
+    (prop [:font-size 'mm2])))
 "a {
   color: blue;
-  font-size: 60%;
+  font-size: 2mm;
 }
 "))
 

@@ -1,7 +1,6 @@
 (ns cssgen
   (:require (clojure.contrib [string :as s]
                              [strint :as strint]
-                             [seq :as sq]
                              [io :as io])))
 
 (defmulti add-rule-item #(:tag %2))
@@ -15,13 +14,64 @@
 (defmethod add-rule-item ::Mixin [parent {components :components}]
   (reduce add-rule-item parent components))
 
+
+(defprotocol Value
+  (repr [x]))
+
+(defrecord Length [mag unit]
+  Value
+  (repr [_] (str mag (s/as-str unit))))
+           
+(extend-protocol Value
+  nil
+    (repr [_] "")
+
+  clojure.lang.Keyword
+    (repr [k] (name k))
+
+  java.lang.String
+    (repr [s] s)
+
+  Object
+    (repr [i] (.toString i)))
+
+
+(defn make-length [mag unit]
+  (Length. mag unit))
+
+
+(defn symbol->value [sym]
+  (let [[_ unit mag] (s/partition #"em|ex|px|in|cm|mm|pt|pc|%" (name sym))]
+      (make-length mag unit)))
+
+
+(defprotocol ProcessProperty
+  (process-property [x]))
+
+(extend-protocol ProcessProperty
+  clojure.lang.IPersistentMap
+    (process-property [m] (:prop m))
+
+  clojure.lang.IPersistentVector
+    (process-property [v] [(map process-property v)])
+
+  clojure.lang.Keyword
+    (process-property [k] k)
+   
+  clojure.lang.Symbol
+    (process-property [s] (symbol->value s))
+
+  Object
+    (process-property [o] o))
+
+
+
+
+
+
+
 (defn prop [& forms]
-  (letfn [(expand-item [item]
-            (if (map? item)
-              (sq/flatten (:prop item))
-              [item]))]
-    (let [expanded (mapcat expand-item forms)]
-      {:tag ::Prop :prop (apply vector (partition 2 expanded))})))
+  {:tag ::Prop :prop (mapcat process-property forms)})
 
 (defn rule [selector & forms]
   (reduce add-rule-item {:tag ::Rule :selector selector :children nil} forms))
@@ -31,9 +81,12 @@
     {:tag ::Mixin :components (vec filtered)}))
 
 (defn rule-css [rule]
-  (letfn [(format-prop [props]
-            (let [lines (map (fn [[k,v]] (strint/<< "  ~(s/as-str k): ~(s/as-str v);"))
-                             props)]
+  (letfn [(format-prop [prop]
+            (let [vals (s/join " " (map repr (next prop)))]
+              (strint/<< "  ~(repr (first prop)): ~{vals};")))
+
+          (format-props [props]
+            (let [lines (map format-prop props)]
               (s/join "\n" lines)))
 
           (nest-single-selector [parent child]
@@ -49,7 +102,7 @@
 
           (child-rule-css [{:keys (tag selector children components prop)} parent-selector]
             (let [nested-selector (nest-selector parent-selector selector)
-                  parent-css (strint/<< "~{nested-selector} {\n~(format-prop prop)\n}\n")
+                  parent-css (strint/<< "~{nested-selector} {\n~(format-props prop)\n}\n")
                   children (or children components)
                   children-css (s/join "\n" (map #(child-rule-css % nested-selector) children))]
               (case tag
