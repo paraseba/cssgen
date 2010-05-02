@@ -1,8 +1,8 @@
 (ns values
-  (:use cssgen clojure.test))
+  (:use cssgen cssgen.types clojure.test))
 
 (deftest single-prop-rules
-  (are [the-rule css] (= css (rule-css the-rule))
+  (are [the-rule result] (= result (css the-rule))
 
 (rule "a" :color "#aaa")
 "a {

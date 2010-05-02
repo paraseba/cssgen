@@ -1,192 +1,56 @@
 (ns cssgen
   (:require (clojure.contrib [string :as s]
                              [strint :as strint]
-                             [io :as io]))
-  (:require [clojure.contrib.generic.arithmetic :as generic]))
-
-(defmulti add-rule-item #(:tag %2))
-
-(defmethod add-rule-item ::Prop [parent {prop :prop}]
-  (merge-with concat parent {:prop prop}))
-
-(defmethod add-rule-item ::Rule [parent rule]
-  (merge-with conj parent {:children rule}))
-
-(defmethod add-rule-item ::Mixin [parent {components :components}]
-  (reduce add-rule-item parent components))
-
-(defmethod add-rule-item nil [parent _]
-  parent)
+                             [io :as io]
+                             [def :as ccdef]))
+  (:use [cssgen.types :only (repr)]))
 
 
-(defprotocol Value
-  (repr [x]))
+(defprotocol Container
+  (nest [child parent])
+  (add-properties [this new-props])
+  (add-rules [this new-rules]))
 
-(defrecord Length [mag unit]
-  Value
-  (repr [_] (str (s/as-str mag) (s/as-str unit))))
+(defrecord Mixin [properties rules]
+  Container
+  (add-properties [_ new-props] (Mixin. (concat properties new-props) rules))
+  (add-rules [_ new-rules] (Mixin. properties (concat rules new-rules)))
+  (nest [this parent] 
+    (-> parent
+      (add-properties properties)
+      (add-rules rules))))
 
-(defrecord Color [r g b]
-  Value
-  (repr [_] (format "#%02X%02X%02X" (int r) (int g) (int b))))
+(defrecord Rule [selector properties rules]
+  Container
+  (add-properties [_ new-props] (Rule. selector (concat properties new-props) rules))
+  (add-rules [_ new-rules] (Rule. selector properties (concat rules new-rules)))
+  (nest [this parent] 
+    (add-rules parent [this])))
 
+(defn- properties [x] (:properties x))
+(defn- rules [x] (:rules x))
+(defn- selector [x] (:selector x))
+(ccdef/defvar- empty-mixin (Mixin. [] []))
+(defn- empty-rule [selector] (Rule. selector [] []))
 
-(defn- make-color [r g b]
-  (letfn [(limit [x] (max 0 (min x 255)))]
-    (Color. (limit r) (limit g) (limit b))))
+(defn- container? [x]
+  (or (instance? Mixin x) (instance? Rule x)))
 
-(extend-protocol Value
-  nil
-    (repr [_] "")
-
-  clojure.lang.IPersistentVector
-    (repr [v] (s/join " " (map repr v)))
-
-  clojure.lang.Keyword
-    (repr [k] (name k))
-
-  java.lang.String
-    (repr [s] s)
-
-  Object
-    (repr [i] (.toString i)))
-
-
-(defn str->color [s]
-  (letfn [(remove-number-sign [s] (s/replace-first-re #"#" "" s))
-          (duplicate [s] (if (= (.length s) 3) (apply str (interleave s s)) s))]
-    (let [components (->> s remove-number-sign duplicate (re-seq #".."))
-          [r g b] (map #(Integer/parseInt % 16) components)]
-
-      (make-color r g b))))
-
-
-(defn make-value [mag unit]
-  (if (= (s/as-str unit) "$")
-    (str->color (s/as-str mag))
-    (Length. mag unit)))
-
-(defmacro def-value-constr [name]
-  `(defn ~name [x#] (make-value x# ~(keyword name))))
-
-(def-value-constr em)
-(def-value-constr ex)
-(def-value-constr px)
-(def-value-constr in)
-(def-value-constr cm)
-(def-value-constr mm)
-(def-value-constr pt)
-(def-value-constr pc)
-(def-value-constr %)
-(def-value-constr $)
-(defn col [x] ($ x))
-
-(defmethod generic/+ [Length Length]
-  [{ua :unit ma :mag} {ub :unit mb :mag}]
-  {:pre [(= ua ub)]}
-  (make-value (+ ma mb) ua))
-
-(defmethod generic/- [Length]
-  [{ua :unit ma :mag}]
-  (make-value (- ma) ua))
-
-(defmethod generic/- [Length Length]
-  [{ua :unit ma :mag} {ub :unit mb :mag}]
-  {:pre [(= ua ub)]}
-  (make-value (- ma mb) ua))
-
-(defmethod generic/* [Length Number]
-  [{ua :unit ma :mag} num]
-  (make-value (* ma num) ua))
-
-(defmethod generic/* [Number Length]
-  [num {ua :unit ma :mag}]
-  (make-value (* ma num) ua))
-
-(generic/defmethod* generic / [Length Number]
-  [{ua :unit ma :mag} num]
-  (make-value ((generic/qsym generic /) ma num) ua))
-
-
-(defmacro compwise-col-col-op [sym f]
-  (let [f f]
-    `(defmethod ~sym [Color Color]
-       [{ra# :r ga# :g ba# :b} {rb# :r gb# :g bb# :b}]
-       (make-color (~f ra# rb#) (~f ga# gb#) (~f ba# bb#)))))
-
-(compwise-col-col-op generic/+ +)
-(compwise-col-col-op generic/- -)
-(compwise-col-col-op generic/* *)
-(generic/defmethod* generic / [Color Color]
-  [{ra :r ga :g ba :b} {rb :r gb :g bb :b}]
-  (make-color ((generic/qsym generic /) ra rb)
-              ((generic/qsym generic /) ga gb)
-              ((generic/qsym generic /) ba bb)))
-
-
-(defmacro compwise-col-num-op [sym f]
-  (let [f f]
-    `(do
-      (defmethod ~sym [Color Number]
-        [{r# :r g# :g b# :b} num#]
-        (make-color (~f r# num#) (~f g# num#) (~f b# num#)))
-      (defmethod ~sym [Number Color]
-        [num# {r# :r g# :g b# :b}]
-        (make-color (~f num# r#) (~f num# g#) (~f num# b#))))))
-
-(compwise-col-num-op generic/+ +)
-(compwise-col-num-op generic/- -)
-(compwise-col-num-op generic/* *)
-(generic/defmethod* generic / [Color Number]
-  [{r :r g :g b :b} num]
-  (make-color ((generic/qsym generic /) r num)
-              ((generic/qsym generic /) g num)
-              ((generic/qsym generic /) b num)))
-(generic/defmethod* generic / [Number Color]
-  [num {r :r g :g b :b}]
-  (make-color ((generic/qsym generic /) num r)
-              ((generic/qsym generic /) num g)
-              ((generic/qsym generic /) num b)))
-
-
-
-(defn is-obj? [x]
-  ;I'm using this function in a partition-by, it's important that it
-  ;always returs false or nil, but not both
-  (boolean (and (map? x)
-                (if-let [t (:tag x)]
-                  (or (= t ::Prop)
-                      (= t ::Rule)
-                      (= t ::Mixin))))))
-
-(defn prop [& forms]
-  (letfn [(expand-item [item]
-            (if (is-obj? item)
-              (flatten (:prop item))
-              [item]))]
-    (let [expanded (mapcat expand-item forms)
-          in-pairs (apply vector (partition 2 expanded))]
-        {:tag ::Prop :prop in-pairs})))
-
-
-(defn create-props [forms]
-  (letfn [(ready? [x] (or (nil? x) (is-obj? x)))]
-    (let [parts (partition-by ready? forms)]
-      (mapcat #(if (ready? (first %))
-                 %
-                 [(apply prop %)])
-              parts))))
+(defn- parse-and-nest [base forms]
+  (letfn [(process-group [base group]
+             (if (container? (first group))
+               (reduce #(nest %2 %1) base group)
+               (add-properties base (partition 2 group))))]
+    (let [grouped (partition-by container? (filter (complement nil?) forms))]
+      (reduce process-group base grouped))))
 
 (defn rule [selector & forms]
-  (reduce add-rule-item
-          {:tag ::Rule :selector selector :children nil}
-          (create-props forms)))
-
+  (parse-and-nest (empty-rule selector) forms))
 
 (defn mixin [& forms]
-  {:tag ::Mixin :components (vec (create-props forms))})
+  (parse-and-nest empty-mixin forms))
 
-(defn rule-css [rule]
+(defn- rule-css [rule]
   (letfn [(format-prop [prop]
             (let [vals (s/join " " (map repr (next prop)))]
               (strint/<< "  ~(repr (first prop)): ~{vals};")))
@@ -206,18 +70,20 @@
               (s/join ", " (for [p parents c children]
                              (nest-single-selector (s/trim p) (s/trim c))))))
 
-          (child-rule-css [{:keys (tag selector children components prop)} parent-selector]
-            (let [nested-selector (nest-selector parent-selector selector)
-                  parent-css (strint/<< "~{nested-selector} {\n~(format-props prop)\n}\n")
-                  children (or children components)
+          (child-rule-css [rule parent-selector]
+            (let [selector (selector rule)
+                  properties (properties rule)
+                  children (rules rule)
+                  nested-selector (nest-selector parent-selector selector)
+                  parent-css (strint/<< "~{nested-selector} {\n~(format-props properties)\n}\n")
                   children-css (s/join "\n" (map #(child-rule-css % nested-selector) children))]
-              (case tag
-                ::Rule (str parent-css children-css)
-                ::Mixin children-css
-                (throw (Exception. "Can only render rules or mixins")))))]
+              (str parent-css children-css)))]
 
     (child-rule-css rule nil)))
 
+(defn css [& rules]
+  (s/map-str rule-css rules))
+
 (defn css-file [path & rules]
-  (io/spit path (s/map-str rule-css rules)))
+  (io/spit path (apply css rules)))
 

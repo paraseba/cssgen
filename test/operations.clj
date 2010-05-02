@@ -1,7 +1,7 @@
 (ns operations
   (:refer-clojure :exclude [+ - * /])
   (:use
-     cssgen
+     cssgen cssgen.types
      clojure.test
      [clojure.contrib.generic.arithmetic :only (+ - * /)]))
 

@@ -2,7 +2,7 @@
   (:use cssgen clojure.test))
 
 (defn- extract-selectors [rule]
-  (map second (re-seq #"(?m)^(.*) \{" (rule-css rule))))
+  (map second (re-seq #"(?m)^(.*) \{" (css rule))))
 
 (deftest nested-selectors
   (are [selectors the-rule] (= selectors (extract-selectors the-rule))
