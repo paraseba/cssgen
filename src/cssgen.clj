@@ -15,7 +15,7 @@
   Container
   (add-properties [_ new-props] (Mixin. (concat properties new-props) rules))
   (add-rules [_ new-rules] (Mixin. properties (concat rules new-rules)))
-  (nest [this parent] 
+  (nest [this parent]
     (-> parent
       (add-properties properties)
       (add-rules rules))))
@@ -24,7 +24,7 @@
   Container
   (add-properties [_ new-props] (Rule. selector (concat properties new-props) rules))
   (add-rules [_ new-rules] (Rule. selector properties (concat rules new-rules)))
-  (nest [this parent] 
+  (nest [this parent]
     (add-rules parent [this])))
 
 (defn- properties [x] (:properties x))
