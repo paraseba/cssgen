@@ -1,6 +1,6 @@
 h1. cssgen
 
-A clojure library to generate CSS code using an embedded domain-specific language (EDSL). In plain words: generate CSS files
+A *clojure* library to generate *CSS* code using an embedded domain-specific language (EDSL). In plain words: generate CSS files
 by writing clojure code.
 
 You can go "here":http://wiki.github.com/paraseba/cssgen/ to read more about cssgen.
@@ -38,7 +38,7 @@ like:
 </code>
 </pre>
 
-* Define reusable CSS snippets using plain old clojure functions
+* Define reusable CSS snippets using plain old clojure functions and vars
 
 <pre>
 <code>
@@ -79,6 +79,9 @@ like:
 
     (defvar float-right (float-side :right)
       "Implementation of float:right with fix for double-margin bug")
+
+    (rule "#secondary"
+      float-right)
 </code>
 </pre>
 
@@ -97,7 +100,7 @@ h2. Usage
 
 I'll show some examples of use, but you should read the "wiki":http://wiki.github.com/paraseba/cssgen/ for more details and information.
 
-* CSS rules: to create a simple rule you use <code>rule</code> function, passing the selector as first argument, and a
+* CSS rules: to create a simple rule you use the <code>rule</code> function, passing the selector as first argument, and a
 series of property pairs.
 
 <pre>
@@ -112,12 +115,13 @@ series of property pairs.
 * Property values could be
 ** keywords,
 ** strings,
-** any other typo convertible to string with <code>as-str</code>,
+** any other type convertible to string with <code>as-str</code>,
+** values sequences
 ** special constructions like <code>(px 9)</code>, <code>(% 30)</code>, <code>(col :#aaa)</code> (more about this
 later).
 
 If a property key must be associated with several values, you use a sequence of values, like in the padding
-property above. Of course, if everything is "literal", you could do <code>:padding "1px 2px 3px 4px"</code>.
+property above. Of course, if everything is "literal", you could simply do <code>:padding "1px 2px 3px 4px"</code>.
 
 * You can nest rules:
 
@@ -143,7 +147,7 @@ property above. Of course, if everything is "literal", you could do <code>:paddi
 </code>
 </pre>
 
-* You can declare mixins with multiple rules and properties using functions or vars. Those can later be used in other
+* You can define mixins with multiple rules and properties using functions or vars. Those can later be used in other
 definitions
 
 <pre>
@@ -171,7 +175,7 @@ definitions
     (def h1-font-size (em 1.5))
     (def h1-color (col :#0000ca))
     (def h2-color (col :#0dd))
-    (def h3-color ($ :#0dd)) ;  $ is just an alias of col
+    (def h3-color ($ :#0dd)) ;  $ is just an alias for col
     (def form-size (% 60))
 </code>
 </pre>
@@ -194,10 +198,10 @@ definitions
     (css-ns killerapp.css.screen
       (:use (killerapp.css reset layout colors)))
 
-        (css-file "public/css/screen.css"  ;this is the path of the target CSS file
-          .......
-          .......  ; all your rules
-          .......)
+    (css-file "public/css/screen.css"  ;this is the path to the target CSS file
+      .......
+      .......  ; all your rules
+      .......)
 </code>
 </pre>
 
@@ -211,7 +215,7 @@ h2. ToDo
 * Added methods to define rules without actually generating any CSS file
 * Property namespaces (font-*) 
 * Write a sass "compiler" to migrate from sass to cssgen
-* Use that compiler to generate the whole [compass](http://compass-style.org/) tree in cssgen.
+* Use that compiler to generate the whole "compass":http://compass-style.org/ tree in cssgen.
 * Document
 * Command line interface
 
