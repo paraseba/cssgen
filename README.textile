@@ -1,39 +1,31 @@
-cssgen
-======
+h1. cssgen
 
 A clojure library to generate CSS code using an embedded domain-specific language (EDSL). In plain words: generate CSS files
 by writing clojure code.
 
-You can go [here](http://wiki.github.com/paraseba/cssgen/) to read more about cssgen.
+You can go "here":http://wiki.github.com/paraseba/cssgen/ to read more about cssgen.
 
 Using clojure instead of plain CSS you get a lot of benefices. You can use the full power of the language to do things
 like:
 
 * Define constants and use them in your rules
+
 <pre>
 <code>
-    (def width (px 960)
+(def width (px 960))
 </code>
 </pre>
+
 * Operate with your constants using clojure expressions
+
 <pre>
 <code>
     (def main-width (* width 0.62))
 </code>
 </pre>
-* Define reusable CSS snippets using plain old clojure functions
-<pre>
-<code>
-    (def unstyled-link
-      (mixin
-        :color :inherit
-        :text-decoration :inherit
-        :cursor :inherit
-        (rule "&:active, &:focus"
-          :outline :none)))
-</code>
-</pre>
+
 * Define nested rules
+
 <pre>
 <code>
     (def unstyled-link
@@ -45,7 +37,27 @@ like:
           :outline :none)))
 </code>
 </pre>
+
+* Define reusable CSS snippets using plain old clojure functions
+
+<pre>
+<code>
+    (def has-layout
+      (mixin
+        ; This makes ie6 get layout
+        :display "inline-block"
+        ; and this puts it back to block
+        (rule "&" :display :block)))
+
+    (def clearfix
+      (mixin
+        :overflow :hidden
+        has-layout))
+</code>
+</pre>
+
 * Generate readable styles with better code organization
+
 <pre>
 <code>
     (rule "#nav"
@@ -54,7 +66,9 @@ like:
         (link-colors my-link-color my-visited-color my-hover-color)))
 </code>
 </pre>
+
 * Easy CSS 'hacks'
+
 <pre>
 <code>
     (defn- float-side [side]
@@ -69,8 +83,7 @@ like:
 </pre>
 
 
-Installation
-============
+h2. Installation
 
 The easiest way to install cssgen is by using Leiningen. Just add the following dependency to your project.clj file:
 
@@ -80,8 +93,7 @@ The easiest way to install cssgen is by using Leiningen. Just add the following 
 </code>
 </pre>
 
-Usage
-=====
+h2. Usage
 
 I'll show some examples of use, but you should read the "wiki":http://wiki.github.com/paraseba/cssgen/ for more details and information.
 
@@ -93,12 +105,19 @@ series of property pairs.
     (rule "ul.nav, ol"
       :color :black
       :background-color :#ddd
-      :padding 0)
+      :padding [:1px "2px" (px 3) 0])
 </code>
 </pre>
 
-* Property values could be keywords, strings, or special constructions like (px 9), (% 30), (col :#aaa) (more about this
-later)
+* Property values could be
+** keywords,
+** strings,
+** any other typo convertible to string with <code>as-str</code>,
+** special constructions like <code>(px 9)</code>, <code>(% 30)</code>, <code>(col :#aaa)</code> (more about this
+later).
+
+If a property key must be associated with several values, you use a sequence of values, like in the padding
+property above. Of course, if everything is "literal", you could do <code>:padding "1px 2px 3px 4px"</code>.
 
 * You can nest rules:
 
@@ -185,8 +204,7 @@ definitions
 Instead of <code>css-ns</code> you could use the normal <code>(ns)</code> call, but it gets a little tricky since we are redefining arithmetic
 operations.
 
-ToDo
-====
+h2. ToDo
 
 * More syntactic sugar
 * Helper functions to operate with colors and lengths
@@ -196,3 +214,5 @@ ToDo
 * Use that compiler to generate the whole [compass](http://compass-style.org/) tree in cssgen.
 * Document
 * Command line interface
+
+h3. Check the "wiki":http://wiki.github.com/paraseba/cssgen/ for more usage information.
