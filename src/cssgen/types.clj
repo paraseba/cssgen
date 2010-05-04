@@ -16,10 +16,6 @@
   (repr [_] (format "#%02X%02X%02X" (int r) (int g) (int b))))
 
 
-(defn- make-color [r g b]
-  (letfn [(limit [x] (max 0 (min x 255)))]
-    (Color. (limit r) (limit g) (limit b))))
-
 (extend-protocol Value
   nil
     (repr [_] "")
@@ -37,60 +33,63 @@
     (repr [i] (.toString i)))
 
 
-(defn- str->color [s]
-  (letfn [(remove-number-sign [s] (s/replace-first-re #"#" "" s))
-          (duplicate [s] (if (= (.length s) 3) (apply str (interleave s s)) s))]
-    (let [components (->> s remove-number-sign duplicate (re-seq #".."))
-          [r g b] (map #(Integer/parseInt % 16) components)]
+(defn- make-color
+  ([r g b] (letfn [(limit [x] (max 0 (min x 255)))]
+             (Color. (limit r) (limit g) (limit b))))
 
-      (make-color r g b))))
+  ([string] (letfn [(remove-number-sign [s] (s/replace-first-re #"#" "" s))
+                    (duplicate [s] (if (= (.length s) 3) (apply str (interleave s s)) s))]
+              (let [components (->> string s/as-str remove-number-sign duplicate (re-seq #".."))
+                    [r g b] (map #(Integer/parseInt % 16) components)]
+
+                (make-color r g b)))))
 
 
-(defn- make-value [mag unit]
-  (if (= (s/as-str unit) "$")
-    (str->color (s/as-str mag))
-    (Length. mag unit)))
+(defn- make-length [mag unit]
+  {:pre [(number? mag)]}
+  (Length. mag (s/as-str unit)))
 
-(ccdef/defmacro- def-value-constr [name]
-  `(defn ~name [x#] (make-value x# ~(keyword name))))
+(ccdef/defmacro- def-length-constr [name]
+  `(defn ~name [x#] (make-length x# ~(keyword name))))
 
-(def-value-constr em)
-(def-value-constr ex)
-(def-value-constr px)
-(def-value-constr in)
-(def-value-constr cm)
-(def-value-constr mm)
-(def-value-constr pt)
-(def-value-constr pc)
-(def-value-constr %)
-(def-value-constr $)
+(def-length-constr em)
+(def-length-constr ex)
+(def-length-constr px)
+(def-length-constr in)
+(def-length-constr cm)
+(def-length-constr mm)
+(def-length-constr pt)
+(def-length-constr pc)
+(def-length-constr %)
+
+(defn $ [x] (make-color x))
 (defn col [x] ($ x))
 
 (defmethod generic/+ [Length Length]
   [{ua :unit ma :mag} {ub :unit mb :mag}]
   {:pre [(= ua ub)]}
-  (make-value (+ ma mb) ua))
+  (make-length (+ ma mb) ua))
 
 (defmethod generic/- [Length]
   [{ua :unit ma :mag}]
-  (make-value (- ma) ua))
+  (make-length (- ma) ua))
 
 (defmethod generic/- [Length Length]
   [{ua :unit ma :mag} {ub :unit mb :mag}]
   {:pre [(= ua ub)]}
-  (make-value (- ma mb) ua))
+  (make-length (- ma mb) ua))
 
 (defmethod generic/* [Length Number]
   [{ua :unit ma :mag} num]
-  (make-value (* ma num) ua))
+  (make-length (* ma num) ua))
 
 (defmethod generic/* [Number Length]
   [num {ua :unit ma :mag}]
-  (make-value (* ma num) ua))
+  (make-length (* ma num) ua))
 
 (generic/defmethod* generic / [Length Number]
   [{ua :unit ma :mag} num]
-  (make-value ((generic/qsym generic /) ma num) ua))
+  (make-length ((generic/qsym generic /) ma num) ua))
 
 
 (ccdef/defmacro- compwise-col-col-op [sym f]
