@@ -5,93 +5,40 @@
      clojure.test
      [clojure.contrib.generic.arithmetic :only (+ - * /)]))
 
+(def all-lengths [em ex px in cm mm pt pc %])
+
 (deftest test-length-+
-  (are [a b res] (= res (+ a b))
-    (em 1) (em 2) (em 3)
-    (ex 1) (ex 2) (ex 3)
-    (px 1) (px 2) (px 3)
-    (in 1) (in 2) (in 3)
-    (cm 1) (cm 2) (cm 3)
-    (mm 1) (mm 2) (mm 3)
-    (pt 1) (pt 2) (pt 3)
-    (pc 1) (pc 2) (pc 3)
-    (% 1) (% 2) (% 3)))
-        
+  (doseq [unit all-lengths]
+    (is (= (unit 3)
+           (+ (unit 1) (unit 2))))))
 
 (deftest test-length--
-  (are [a b res] (= res (- a b))
-    (em 4) (em 2) (em 2)
-    (ex 4) (ex 2) (ex 2)
-    (px 4) (px 2) (px 2)
-    (in 4) (in 2) (in 2)
-    (cm 4) (cm 2) (cm 2)
-    (mm 4) (mm 2) (mm 2)
-    (pt 4) (pt 2) (pt 2)
-    (pc 4) (pc 2) (pc 2)
-    (% 4) (% 2) (% 2)))
+  (doseq [unit all-lengths]
+    (is (= (unit 2)
+           (- (unit 4) (unit 2))))))
 
 (deftest test-length*number
-  (are [a b res] (= res (* a b))
-    (em 3) 2 (em 6)
-    (em 3) 2.0 (em 6.0)
-    (ex 3) 2 (ex 6)
-    (ex 3) 2.0 (ex 6.0)
-    (px 3) 2 (px 6)
-    (px 3) 2.0 (px 6.0)
-    (in 3) 2 (in 6)
-    (in 3) 2.0 (in 6.0)
-    (cm 3) 2 (cm 6)
-    (cm 3) 2.0 (cm 6.0)
-    (mm 3) 2 (mm 6)
-    (mm 3) 2.0 (mm 6.0)
-    (pt 3) 2 (pt 6)
-    (pt 3) 2.0 (pt 6.0)
-    (pc 3) 2 (pc 6)
-    (pc 3) 2.0 (pc 6.0)
-    (% 3) 2 (% 6)
-    (% 3) 2.0 (% 6.0)))
+  (doseq [unit all-lengths]
+    (is (= (unit 6)
+           (* (unit 3) 2)))
+    (is (= (unit 6.0)
+           (* (unit 3) 2.0)))))
 
 (deftest test-number*length
-  (are [a b res] (= res (* a b))
-    2 (em 3) (em 6)
-    2.0 (em 3) (em 6.0)
-    2 (ex 3) (ex 6)
-    2.0 (ex 3) (ex 6.0)
-    2 (px 3) (px 6)
-    2.0 (px 3) (px 6.0)
-    2 (in 3) (in 6)
-    2.0 (in 3) (in 6.0)
-    2 (cm 3) (cm 6)
-    2.0 (cm 3) (cm 6.0)
-    2 (mm 3) (mm 6)
-    2.0 (mm 3) (mm 6.0)
-    2 (pt 3) (pt 6)
-    2.0 (pt 3) (pt 6.0)
-    2 (pc 3) (pc 6)
-    2.0 (pc 3) (pc 6.0)
-    2 (% 3) (% 6)
-    2.0 (% 3) (% 6.0)))
+  (doseq [unit all-lengths]
+    (is (= (unit 6)
+           (* 2 (unit 3))))
+    (is (= (unit 6.0)
+           (* 2.0 (unit 3))))))
+
 
 (deftest test-length-divided-by-number
-  (are [a b res] (= res (/ a b))
-    (em 4) 2 (em 2)
-    (em 4) 2.0 (em 2.0)
-    (ex 4) 2 (ex 2)
-    (ex 4) 2.0 (ex 2.0)
-    (px 4) 2 (px 2)
-    (px 4) 2.0 (px 2.0)
-    (in 4) 2 (in 2)
-    (in 4) 2.0 (in 2.0)
-    (cm 4) 2 (cm 2)
-    (cm 4) 2.0 (cm 2.0)
-    (mm 4) 2 (mm 2)
-    (mm 4) 2.0 (mm 2.0)
-    (pt 4) 2 (pt 2)
-    (pt 4) 2.0 (pt 2.0)
-    (pc 4) 2 (pc 2)
-    (pc 4) 2.0 (pc 2.0)
-    (% 4) 2 (% 2)
-    (% 4) 2.0 (% 2.0)))
+  (doseq [unit all-lengths]
+    (is (= (unit 2)
+           (/ (unit 4) 2)))
+    (is (= (unit 2.0)
+           (/ (unit 4) 2.0)))))
+
 
 (deftest color+color
   (are [a b res] (= res (+ a b))
