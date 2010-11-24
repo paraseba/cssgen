@@ -62,8 +62,10 @@
 (def-length-constr pc)
 (def-length-constr %)
 
-(defn $ [x] (make-color x))
-(defn col [x] ($ x))
+(defn col
+  ([x] (make-color x))
+  ([r g b] (make-color r g b)))
+(def $ col)
 
 (defmethod generic/+ [Length Length]
   [{ua :unit ma :mag} {ub :unit mb :mag}]
