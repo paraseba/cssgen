@@ -57,6 +57,7 @@
       :width (mm 1)
       :width (pt 1)
       :width (pc 1)
+      :width (deg 1)
       :width (% 1))
 "a {
   width: 1em;
@@ -67,6 +68,7 @@
   width: 1mm;
   width: 1pt;
   width: 1pc;
+  width: 1deg;
   width: 1%;
 }
 "

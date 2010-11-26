@@ -61,6 +61,7 @@
 (def-length-constr pt)
 (def-length-constr pc)
 (def-length-constr %)
+(def-length-constr deg)
 
 (defn col
   ([x] (make-color x))
