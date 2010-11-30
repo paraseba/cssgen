@@ -73,7 +73,7 @@
   {:pre [(= ua ub)]}
   (make-length (+ ma mb) ua))
 
-(defmethod generic/- [Length]
+(defmethod generic/- Length
   [{ua :unit ma :mag}]
   (make-length (- ma) ua))
 
