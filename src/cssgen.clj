@@ -1,5 +1,5 @@
 (ns cssgen
-  (:use [clojure.string :only [join]]
+  (:use [clojure.string :only [join split]]
         [clojure.core.incubator :only [seqable?]]))
   ;(:require (clojure.contrib [string :as s]
                              ;[strint :as strint]
@@ -30,7 +30,7 @@
         (map (fn [[name value]]
                (indent spaces
                        (str (to-css name)
-                            " "
+                            ": "
                             (to-css value)
                             ";")))
              (partition 2 props))))
@@ -39,33 +39,36 @@
   {:pre [(seqable? rule)]}
   (to-css (first rule)))
 
-(defn selector-string [parent-rules rule]
+(defn selector-string [parent-selectors rule]
   (cond
-    (and (seq parent-rules) (re-matches #".*&.*" (selector rule)))
-    (join " " (concat (butlast (map selector parent-rules))
+    (and (seq parent-selectors) (re-matches #".*&.*" (selector rule)))
+    (join " " (concat (butlast parent-selectors)
                       [(clojure.string/replace (selector rule)
                                                "&"
-                                               (selector (last parent-rules)))]))
-    (seq parent-rules) (join " " (concat (map selector parent-rules) [(selector rule)]))
+                                               (last parent-selectors))]))
+    (seq parent-selectors) (join " " (concat parent-selectors [(selector rule)]))
     :else (selector rule)))
 
+(declare compile-subrules)
 (defn compile-rule
-  ([parent-rules rule]
+  ([parent-selectors rule]
    {:pre [(seqable? rule)]
     :post [(string? %)]}
-   (let [subrules (filter vector? rule)
-         properties (remove vector? (rest rule))
-         tabs (count parent-rules)]
-     (str (indent tabs (selector-string parent-rules rule)) " {\n"
+   (let [properties (remove vector? (rest rule))
+         tabs (count parent-selectors)
+         subrules (compile-subrules parent-selectors rule)]
+     (str (indent tabs (selector-string parent-selectors rule)) " {\n"
           (compile-properties (inc tabs) properties)
           "\n"
           (indent tabs "}")
-          (when (seq subrules)
-            (str "\n"
-                 (join "\n"
-                       (map (partial compile-rule (conj parent-rules rule))
-                            subrules)))))))
+          (when subrules (str "\n" (join "\n" subrules))))))
   ([rule] (compile-rule [] rule)))
+
+(defn compile-subrules [parent-selectors rule]
+  {:pre [(seqable? rule)]}
+  (let [selectors (split (selector rule) #"\s*,\s*")]
+    (for [sel selectors r (filter vector? rule)]
+      (compile-rule (conj parent-selectors sel) r))))
 
 (defn css [& rules]
   (join "\n" (map compile-rule rules)))
