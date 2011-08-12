@@ -44,15 +44,20 @@
     (seq parent-selectors) (join " " (concat parent-selectors [(selector rule)]))
     :else (selector rule)))
 
+(defn flatten-rule [rule]
+  (filter (complement seq?)
+          (rest (tree-seq seq? identity (seq rule)))))
+
 (defn split-rule [rule]
   {:post [(map? %) (= 2 (count %)) (contains? % :rules) (contains? % :props)]}
   (reduce
     (fn [{:keys [props] :as res} item]
-      (if (and (vector? item) (even? (count props)))
-        (update-in res [:rules] conj item)
-        (update-in res [:props] conj item)))
+      (cond
+        (and (vector? item) (even? (count props))) (update-in res [:rules] conj item)
+        (seq? item) (merge-with conj res (split-rule item))
+        :else (update-in res [:props] conj item)))
     {:rules [] :props []}
-    (rest rule)))
+    (rest (flatten-rule rule))))
 
 (declare compile-subrules)
 (defn compile-rule

@@ -26,11 +26,6 @@
 
 (deftest sequence-values
   (are [the-rule result] (= result (css the-rule))
-    [:.foo :border '("5px" :solid "red")]
-".foo {
-  border: 5px solid red;
-}"
-
     [:.foo :border ["5px" :solid "red"]]
 ".foo {
   border: 5px solid red;
@@ -76,3 +71,20 @@
     #sidebar a:hover {
       color: #00e;
     }"))
+
+(deftest sequence-expansion
+  (let [inner '(:color :blue :margin "auto" ["&:hover" :border ["1px" "solid" :black]])]
+    (are [the-rule result] (= result (css the-rule))
+      [:#block
+       :background-color :#fff
+       inner
+       :width "100%"]
+"#block {
+  background-color: #fff;
+  color: blue;
+  margin: auto;
+  width: 100%;
+}
+  #block:hover {
+    border: 1px solid black;
+  }")))
