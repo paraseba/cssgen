@@ -17,6 +17,8 @@
   clojure.lang.PersistentList
   (to-css [this] (join " " (map to-css this))))
 
+(load "types")
+
 (defn indent [n s]
   (str (join (repeat (* 2 n) \ )) s))
 

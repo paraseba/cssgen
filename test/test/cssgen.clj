@@ -88,3 +88,29 @@
   #block:hover {
     border: 1px solid black;
   }")))
+
+(deftest lengths-test
+  (are [s l] (= (str "div {\n  width: " s ";\n}") (css [:div :width l]))
+    "5em"  (em 5)
+    "5ex"  (ex 5)
+    "5px"  (px 5)
+    "5in"  (in 5)
+    "5cm"  (cm 5)
+    "5mm"  (mm 5)
+    "5pt"  (pt 5)
+    "5pc"  (pc 5)
+    "5%"   (% 5)
+    "5deg" (deg 5)))
+
+(deftest make-color-test
+  (are [s l] (= (str "div {\n  color: " s ";\n}") (css [:div :color l]))
+    "#FFFFFF" (col 255 255 255)
+    "#FFFFFF" (col "ffffff")
+    "#FFFFFF" (col "#ffffff")
+    "#FFFFFF" (col "fff")
+    "#FFFFFF" (col "#fff")
+    "#1122AA" (col 17 34 170)
+    "#1122AA" (col "1122AA")
+    "#1122AA" (col "#1122AA")
+    "#1122AA" (col "12A")
+    "#1122AA" (col "#12A")))
