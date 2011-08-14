@@ -19,14 +19,14 @@
             (bit-and 0xff))))
          (rest m))))
 
-(defn col
+(defn rgb
   ([r g b]
    {:pre [(every? integer? [r g b])] :post [(= Color (class %))]}
    (letfn [(limit [x] (max 0 (min x 255)))]
      (Color. (limit r) (limit g) (limit b))))
   ([s]
    {:pre [(string? s)] :post [(= Color (class %))]}
-   (apply col (color-string->rgb s))))
+   (apply rgb (color-string->rgb s))))
 
 (defn- make-length [mag unit]
   {:pre [(number? mag) (or (symbol? unit) (keyword? unit) (string? unit))]}
