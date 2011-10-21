@@ -5,12 +5,17 @@
      clojure.test
      [clojure.contrib.generic.arithmetic :only (+ - * /)]))
 
-(def all-lengths [em ex px in cm mm pt pc %])
+(def all-lengths [em ex px in cm mm pt pc % deg])
 
 (deftest test-length-+
   (doseq [unit all-lengths]
     (is (= (unit 3)
            (+ (unit 1) (unit 2))))))
+
+(deftest test-length-unary-
+  (doseq [unit all-lengths]
+    (is (= (unit -2)
+           (- (unit 2))))))
 
 (deftest test-length--
   (doseq [unit all-lengths]
