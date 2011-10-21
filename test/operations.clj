@@ -3,7 +3,7 @@
   (:use
      cssgen cssgen.types
      clojure.test
-     [clojure.contrib.generic.arithmetic :only (+ - * /)]))
+     [clojure.algo.generic.arithmetic :only (+ - * /)]))
 
 (def all-lengths [em ex px in cm mm pt pc % deg])
 

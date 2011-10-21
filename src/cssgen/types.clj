@@ -1,15 +1,19 @@
 (ns cssgen.types
-  (:require
-     (clojure.contrib [string :as s]
-                      [def :as ccdef])
-     [clojure.contrib.generic.arithmetic :as generic]))
+  (:require [clojure.string :as s]
+            [clojure.algo.generic.arithmetic :as generic]))
+
+;; copied from contrib
+(defn- as-str [x]
+  (if (instance? clojure.lang.Named x)
+    (name x)
+    (str x)))
 
 (defprotocol Value
   (repr [x]))
 
 (defrecord Length [mag unit]
   Value
-  (repr [_] (str (s/as-str mag) (s/as-str unit))))
+  (repr [_] (str (as-str mag) (as-str unit))))
 
 (defrecord Color [r g b]
   Value
@@ -37,9 +41,9 @@
   ([r g b] (letfn [(limit [x] (max 0 (min x 255)))]
              (Color. (limit r) (limit g) (limit b))))
 
-  ([string] (letfn [(remove-number-sign [s] (s/replace-first-re #"#" "" s))
+  ([string] (letfn [(remove-number-sign [s] (s/replace-first s #"#" ""))
                     (duplicate [s] (if (= (.length s) 3) (apply str (interleave s s)) s))]
-              (let [components (->> string s/as-str remove-number-sign duplicate (re-seq #".."))
+              (let [components (->> string as-str remove-number-sign duplicate (re-seq #".."))
                     [r g b] (map #(Integer/parseInt % 16) components)]
 
                 (make-color r g b)))))
@@ -47,9 +51,9 @@
 
 (defn- make-length [mag unit]
   {:pre [(number? mag)]}
-  (Length. mag (s/as-str unit)))
+  (Length. mag (as-str unit)))
 
-(ccdef/defmacro- def-length-constr [name]
+(defmacro ^{:private true} def-length-constr [name]
   `(defn ~name [x#] (make-length x# ~(keyword name))))
 
 (def-length-constr em)
@@ -95,7 +99,7 @@
   (make-length ((generic/qsym generic /) ma num) ua))
 
 
-(ccdef/defmacro- compwise-col-col-op [sym f]
+(defmacro ^{:private true} compwise-col-col-op [sym f]
   (let [f f]
     `(defmethod ~sym [Color Color]
        [{ra# :r ga# :g ba# :b} {rb# :r gb# :g bb# :b}]
@@ -111,7 +115,7 @@
               ((generic/qsym generic /) ba bb)))
 
 
-(ccdef/defmacro- compwise-col-num-op [sym f]
+(defmacro ^{:private true} compwise-col-num-op [sym f]
   (let [f f]
     `(do
       (defmethod ~sym [Color Number]

@@ -1,10 +1,7 @@
 (ns cssgen
-  (:require (clojure.contrib [string :as s]
-                             [strint :as strint]
-                             [io :as io]
-                             [def :as ccdef]))
+  (:require [clojure.string :as s]
+            [clojure.java.io :as io])
   (:use [cssgen.types :only (repr)]))
-
 
 (defprotocol Container
   (nest [child parent])
@@ -30,7 +27,7 @@
 (defn- properties [x] (:properties x))
 (defn- rules [x] (:rules x))
 (defn- selector [x] (:selector x))
-(ccdef/defvar- empty-mixin (Mixin. [] []))
+(def ^{:private true} empty-mixin (Mixin. [] []))
 (defn- empty-rule [selector] (Rule. selector [] []))
 
 (defn- container? [x]
@@ -52,21 +49,22 @@
 
 (defn- rule-css [rule]
   (letfn [(format-prop [prop]
-            (let [vals (s/join " " (map repr (next prop)))]
-              (strint/<< "  ~(repr (first prop)): ~{vals};")))
+            (let [key (repr (first prop))
+                  vals (s/join " " (map repr (next prop)))]
+              (format "  %s: %s;" key vals)))
 
           (format-props [props]
             (let [lines (map format-prop props)]
               (s/join "\n" lines)))
 
           (nest-single-selector [parent child]
-            (if (s/substring? "&" child)
-              (s/replace-str "&" parent child)
+            (if (.contains child "&")
+              (.replace child "&" parent)
               (str parent (if-not (s/blank? parent) " ") child)))
 
           (nest-selector [parent child]
-            (let [parents (s/split #"," (or parent ""))
-                  children (s/split #"," (or child ""))]
+            (let [parents (s/split (or parent "") #",")
+                  children (s/split (or child "") #",")]
               (s/join ", " (for [p parents c children]
                              (nest-single-selector (s/trim p) (s/trim c))))))
 
@@ -75,15 +73,17 @@
                   properties (properties rule)
                   children (rules rule)
                   nested-selector (nest-selector parent-selector selector)
-                  parent-css (strint/<< "~{nested-selector} {\n~(format-props properties)\n}\n")
-                  children-css (s/join "\n" (map #(child-rule-css % nested-selector) children))]
+                  parent-css (format "%s {\n%s\n}\n"
+                                     nested-selector (format-props properties))
+                  children-css (s/join "\n" (for [c children]
+                                              (child-rule-css c nested-selector)))]
               (str parent-css children-css)))]
 
     (child-rule-css rule nil)))
 
 (defn css [& rules]
-  (s/map-str rule-css rules))
+  (apply str (map rule-css rules)))
 
 (defn css-file [path & rules]
-  (io/spit path (apply css rules)))
+  (spit path (apply css rules)))
 
