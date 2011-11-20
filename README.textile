@@ -91,7 +91,7 @@ The easiest way to install cssgen is by using Leiningen. Just add the following 
 
 <pre>
 <code>
-    [cssgen "0.2.5-SNAPSHOT"]
+    [cssgen "0.2.5"]
 </code>
 </pre>
 
