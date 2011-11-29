@@ -3,4 +3,6 @@
 /cssgen.jar
 /*.jar
 /pom.xml
-
+/multi-lib
+/.lein-deps-sum
+/.lein-failures
