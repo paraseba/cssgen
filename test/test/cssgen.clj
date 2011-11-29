@@ -105,9 +105,10 @@
 (deftest make-color-test
   (are [s l] (= (str "div {\n  color: " s ";\n}") (css [:div :color l]))
     "#FFFFFF" (rgb 255 255 255)
-    "#FFFFFF" (rgb "ffffff")
-    "#FFFFFF" (rgb "#ffffff")
-    "#FFFFFF" (rgb "fff")
+    "#CCCCCC" (rgb "cccccc")
+    "#CCCCCC" (rgb "#cccccc")
+    "#ACBDCE" (rgb "#acbdce")
+    "#CCCCCC" (rgb "ccc")
     "#FFFFFF" (rgb "#fff")
     "#1122AA" (rgb 17 34 170)
     "#1122AA" (rgb "1122AA")
