@@ -107,6 +107,13 @@
           (for [p parents c children]
             (nest-selector (trim p) (trim c))))))
 
+(defn format-rule
+  "Generate rule css given all the parts as strings"
+  [selector props subrules tabs]
+  {:pre [(every? string? [selector props subrules]) (number? tabs)]}
+  (indent tabs
+          (str selector " {\n" props "\n}" subrules)))
+
 (defn compile-rule
   "Generate CSS string for a rule and its sub-rules"
   ([rule parent-selector tabs]
@@ -116,12 +123,8 @@
          full-selector (selector-string parent-selector selector)
          subrules (map #(compile-rule % full-selector 1) subrules)
          props-css (indent 1 (compile-properties props))
-         subrules-css (when (seq subrules) (str "\n" (in-lines subrules)))
-         css (str full-selector " {\n"
-                  props-css
-                  "\n}"
-                  subrules-css)]
-     (indent tabs css)))
+         subrules-css (if (seq subrules) (str "\n" (in-lines subrules)) "")]
+     (format-rule full-selector props-css subrules-css tabs)))
   ([rule] (compile-rule rule nil 0)))
 
 (defn css
