@@ -1,6 +1,5 @@
 (ns cssgen
-  (:use [clojure.string :only [join split split-lines blank? trim]]
-        [clojure.core.incubator :only [seqable?]]))
+  (:use [clojure.string :only [join split split-lines blank? trim]]))
 
 (defprotocol CssValue
   (to-css [this]))
