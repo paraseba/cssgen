@@ -21,6 +21,10 @@
 
 (load "types")
 
+(defn is-rule? [r]
+  (and (map? r)
+       (every? r [:selector :subrules :props])))
+
 (defn parse-rule
   "Parse a rule returning a map of :subrules, :props and :selector.
   Subrules are parsed recursively. Does mixin expansion. A mixin is
@@ -33,6 +37,8 @@
                  [:wrapper
                    :background-color :gray]])"
   [rule]
+  {:pre  [(vector? rule) (seq rule)]
+   :post [(is-rule? %)]}
   (let [is-mixin? seq?
         mixin-content identity
         expand-mixins
@@ -65,6 +71,7 @@
 (defn indent
   "Indent the string s by 2n spaces"
   [n s]
+  {:pre [(number? n) (string? s)]}
   (let [spacer (apply str (repeat (* 2 n) \ ))]
     (->> s
       split-lines
@@ -76,6 +83,8 @@
   Example:
     (compile-properties '((:color :blue) (:width \"900px\")))"
   [props]
+  {:pre [(sequential? props) (every? sequential? props)]
+   :post [(string? %)]}
   (->> props
     (map (fn [[name value]]
            (format "%s: %s;" (to-css name) (to-css value))))
@@ -86,6 +95,7 @@
   selectors. Make & substitution and coma expansion. parent-selector
   and selector must be rule items (to-css will be called on them)."
   [parent-selector selector]
+  {:pre [(not (nil? selector))]}
   (let [nest-selector (fn [parent child]
                         (if (.contains child "&")
                           (.replace child "&" parent)
@@ -101,6 +111,8 @@
 (defn compile-rule
   "Generate CSS string for a rule and its sub-rules"
   ([rule parent-selector tabs]
+   {:pre  [(is-rule? rule) (>= tabs 0)]
+    :post [(string? %)]}
    (let [{:keys [subrules props selector]} rule
          full-selector (selector-string parent-selector selector)
          subrules (map #(compile-rule % full-selector 1) subrules)
