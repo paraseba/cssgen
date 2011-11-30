@@ -1,6 +1,5 @@
 (ns test.cssgen
-  (:use cssgen)
-  (:use clojure.test))
+  (:use cssgen clojure.test))
 
 (deftest simple-rules-test
   (are [the-rule result] (= result (css the-rule))
@@ -59,18 +58,23 @@
 "#content, #sidebar {
   background-color: white;
 }
-  #content a {
+  #content a, #sidebar a {
     color: blue;
   }
-    #content a:hover {
+    #content a:hover, #sidebar a:hover {
       color: #00e;
-    }
-  #sidebar a {
+    }"
+
+    [:body
+      :width :900px;
+      ["a, input" :color :blue]]
+"body {
+  width: 900px;
+}
+  body a, body input {
     color: blue;
-  }
-    #sidebar a:hover {
-      color: #00e;
-    }"))
+  }"
+       ))
 
 (deftest sequence-expansion
   (let [inner '(:color :blue :margin "auto" ["&:hover" :border ["1px" "solid" :black]])]

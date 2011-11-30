@@ -6,6 +6,11 @@
 
 (def all-lengths [em ex px in cm mm pt pc % deg])
 
+(deftest length-equality
+  (doseq [unit all-lengths]
+                (is (not= (unit 1) (unit 2)))
+                (is (= (unit 1) (unit 1)))))
+
 (deftest test-length-+
   (doseq [unit all-lengths]
     (is (= (unit 3)
