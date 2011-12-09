@@ -69,7 +69,7 @@
 
 (generic/defmethod* generic / [Length Number]
   [{ua :unit ma :mag} num]
-  (make-length ((generic/qsym generic /) ma num) ua))
+  (make-length (/ ma num) ua))
 
 
 (defmacro ^{:private true} compwise-col-col-op [sym f]
