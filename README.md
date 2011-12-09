@@ -11,7 +11,7 @@ full power of the language to do things like:
 
 * Define constants and use them in your rules
 
-    @@@clojure
+    ```clojure
     (def width (px 960))
 
 * Operate with your constants using clojure expressions
