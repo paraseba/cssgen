@@ -196,6 +196,7 @@ vars) that return sequences. Those can later be used in other definitions
   - Dropped `rule` and `mixin` functions in favor of vectors and lists
   - Dropped `css-ns`, you're on your own now
   - Dropped `css-file`, you're on your own now
+  - Tabulated output
   - The only way to generate colors is using `rgb` function
 
 ## ToDo
