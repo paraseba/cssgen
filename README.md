@@ -72,8 +72,9 @@ full power of the language to do things like:
 The easiest way to install cssgen is by using Leiningen. Just add the following
 dependency to your project.clj file:
 
-    ```clojure
-    [cssgen "0.3.0-SNAPSHOT"]
+```clojure
+[cssgen "0.3.0-SNAPSHOT"]
+```
 
 ## Usage
 
@@ -111,13 +112,14 @@ values, like in the padding property above. Of course, if everything is
 
 to generate the following CSS
 
-    ```
-    #main, #secondary {
-      padding: 10px;
-    }
-      #main h1, #secondary h1 {
-        color: blue;
-      }
+```css
+#main, #secondary {
+  padding: 10px;
+}
+  #main h1, #secondary h1 {
+    color: blue;
+  }
+```
 
 * If you need the parent selector on the nested rule, you can use "&" and it
 will get replaced:
@@ -131,13 +133,14 @@ will get replaced:
 
 will generate
 
-    ```
-    a {
-      color: #00C;
-    }
-      a:hover {
-        color: #0CC;
-      }
+```css
+a {
+  color: #00C;
+}
+  a:hover {
+    color: #0CC;
+  }
+```
 
 
 * You can define mixins with multiple rules and properties using functions (or
@@ -205,7 +208,7 @@ tree in cssgen.
 * Document
 * Command line interface
 
-h3. Check the [wiki](http://wiki.github.com/paraseba/cssgen/ for more usage)
+### Check the [wiki](http://wiki.github.com/paraseba/cssgen/ for more usage)
 information.
 
 If you have a feature request, problem or comment, just drop me a line.
