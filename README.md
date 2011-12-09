@@ -16,16 +16,12 @@ full power of the language to do things like:
 
 * Operate with your constants using clojure expressions
 
-<pre>
-<code>
+    ```clojure
     (def main-width (* width 0.6))
-</code>
-</pre>
 
 * Define nested rules
 
-<pre>
-<code>
+    ```clojure
     [:a.plain
       :color :inherit
       :text-decoration :inherit
@@ -33,13 +29,10 @@ full power of the language to do things like:
 
       ["&:active, &:focus"
         :outline :none]]
-</code>
-</pre>
 
 * Define reusable CSS snippets using plain old clojure functions and vars
 
-<pre>
-<code>
+    ```clojure
     (def ^{:doc "ie hack"}
       has-layout
       (list :display :inline-block
@@ -47,24 +40,18 @@ full power of the language to do things like:
 
     (def clearfix
       (list :overflow :hidden has-layout))
-</code>
-</pre>
 
 * Generate readable styles with better code organization
 
-<pre>
-<code>
+    ```clojure
     [:#nav
       (horizontal-list (px 9))
       [:a
         (link-colors my-link-color my-visited-color my-hover-color)]]
-</code>
-</pre>
 
 * Easy CSS 'hacks'
 
-<pre>
-<code>
+    ```clojure
     (defn- float-side [side]
       (list :display :inline :float side))
 
@@ -78,8 +65,6 @@ full power of the language to do things like:
 
     [:#secondary
       float-right]
-</code>
-</pre>
 
 
 ## Installation
@@ -87,11 +72,8 @@ full power of the language to do things like:
 The easiest way to install cssgen is by using Leiningen. Just add the following
 dependency to your project.clj file:
 
-<pre>
-<code>
+    ```clojure
     [cssgen "0.3.0-SNAPSHOT"]
-</code>
-</pre>
 
 ## Usage
 
@@ -101,14 +83,11 @@ I'll show some examples of use, but you should read the
 * CSS rules: to create a simple rule you use a clojure vector with the
 selector as first element, and a series of property pairs.
 
-<pre>
-<code>
+    ```clojure
     ["ul.nav, ol"
       :color :black
       :background-color :#ddd
       :padding [:1px "2px" (px 3) 0]]
-</code>
-</pre>
 
 * Selectors and property values could be
 ** keywords, strings, numbers
@@ -123,61 +102,48 @@ values, like in the padding property above. Of course, if everything is
 
 * You can nest rules:
 
-<pre>
-<code>
+    ```clojure
     ["#main, #secondary"
       :padding "10px"
 
       [:h1   ; this will generate a rule for "#main h1, #secondary h1"
         :color :blue]]
-</code>
-</pre>
 
 to generate the following CSS
 
-<pre>
-<code>
+    ```css
     #main, #secondary {
       padding: 10px;
     }
       #main h1, #secondary h1 {
         color: blue;
       }
-</code>
-</pre>
 
 * If you need the parent selector on the nested rule, you can use "&" and it
 will get replaced:
 
-<pre>
-<code>
+    ```clojure
     [:a
       :color "#00C"
 
       ["&:hover"  ; this will generate a rule for a:hover
         :color "#0CC"]]
-</code>
-</pre>
 
 will generate
 
-<pre>
-<code>
+    ```css
     a {
       color: #00C;
     }
       a:hover {
         color: #0CC;
       }
-</code>
-</pre>
 
 
 * You can define mixins with multiple rules and properties using functions (or
 vars) that return sequences. Those can later be used in other definitions
 
-<pre>
-<code>
+    ```clojure
     (defn link-colors
       ([normal] (link-colors normal nil))
       ([normal hover] (link-colors normal hover nil))
@@ -188,38 +154,29 @@ vars) that return sequences. Those can later be used in other definitions
           (when hover   ["&:hover" :color hover]))))
 
     [:a (link-colors "#00c" "#0cc")]
-</code>
-</pre>
 
 * As you can see in the previous example, nils in the properties list will be ignored:
 
 * You can easily define constants
 
-<pre>
-<code>
+    ```clojure
     (def width (px 960))
     (def h1-font-size (em 1.5))
     (def h1-color (rgb :#0000ca))
     (def h2-color (rgb :#0dd))
     (def form-size (% 60))
-</code>
-</pre>
 
 * And use the basic arithmetic operations on them
 
-<pre>
-<code>
+    ```clojure
     (def main-width (* 0.7 width))
     (def h2-font-size (- h1-font-size (em 0.3)))
     (def h4-color (/ (+ h1-color h2-color) 2))
-</code>
-</pre>
 
 * To generate a new CSS file from the current clj code do:
 
-<pre>
-<code>
 
+    ```clojure
     (ns killerapp.css.screen
       (:refer-clojure :exclude [+ - * /])
       (:use cssgen clojure.algo.generic.arithmetic))
@@ -230,8 +187,6 @@ vars) that return sequences. Those can later be used in other definitions
         .......
         .......  ; all your rules
         .......))
-</code>
-</pre>
 
 ## Changes
 * 0.3.0-SNAPSHOT
