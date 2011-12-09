@@ -90,11 +90,11 @@ selector as first element, and a series of property pairs.
       :padding [:1px "2px" (px 3) 0]]
 
 * Selectors and property values could be
-- keywords, strings, numbers
-- vectors and lists
-- special constructions like <code>(px 9)</code>, <code>(% 30)</code>,
-<code>(col :#aaa)</code> (more about this later)
-** other types converted using <code>str</code> function.
+  - keywords, strings, numbers
+  - vectors and lists
+  - special constructions like <code>(px 9)</code>, <code>(% 30)</code>,
+  <code>(col :#aaa)</code> (more about this later)
+  - other types converted using <code>str</code> function.
 
 If a property key must be associated with several values, you use a sequence of
 values, like in the padding property above. Of course, if everything is
@@ -190,10 +190,10 @@ vars) that return sequences. Those can later be used in other definitions
 
 ## Changes
 * 0.3.0-SNAPSHOT
-- Dropped <code>rule</code> and <code>mixin</code> functions in favor of vectors and lists
-- Dropped <code>css-ns</code>, you're on your own now
-- Dropped <code>css-file</code>, you're on your own now
-- The only way to generate colors is using <code>rgb</code> function
+  - Dropped <code>rule</code> and <code>mixin</code> functions in favor of vectors and lists
+  - Dropped <code>css-ns</code>, you're on your own now
+  - Dropped <code>css-file</code>, you're on your own now
+  - The only way to generate colors is using <code>rgb</code> function
 
 ## ToDo
 
