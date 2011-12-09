@@ -1,9 +1,9 @@
 # cssgen
 
-A *clojure* library to generate *CSS* code using an embedded domain-specific
+A **clojure** library to generate **CSS** code using an embedded domain-specific
 language (EDSL). In plain words: generate CSS files by writing clojure code.
 
-You can go "here":http://wiki.github.com/paraseba/cssgen/ to read more about
+You can go [here](http://wiki.github.com/paraseba/cssgen/) to read more about
 cssgen.
 
 Using clojure instead of plain CSS you get a lot of benefices. You can use the
@@ -11,11 +11,8 @@ full power of the language to do things like:
 
 * Define constants and use them in your rules
 
-<pre>
-<code>
+    @@@clojure
     (def width (px 960))
-</code>
-</pre>
 
 * Operate with your constants using clojure expressions
 
@@ -99,7 +96,7 @@ dependency to your project.clj file:
 ## Usage
 
 I'll show some examples of use, but you should read the
-"wiki":http://wiki.github.com/paraseba/cssgen/ for more details and information.
+[wiki](http://wiki.github.com/paraseba/cssgen/) for more details and information.
 
 * CSS rules: to create a simple rule you use a clojure vector with the
 selector as first element, and a series of property pairs.
@@ -248,12 +245,12 @@ vars) that return sequences. Those can later be used in other definitions
 * Watcher to re-generate css files if source changed ???
 * Property namespaces (font-*)
 * Write a sass "compiler" to migrate from sass to cssgen
-* Use that compiler to generate the whole "compass":http://compass-style.org/
+* Use that compiler to generate the whole [compass](http://compass-style.org/)
 tree in cssgen.
 * Document
 * Command line interface
 
-h3. Check the "wiki":http://wiki.github.com/paraseba/cssgen/ for more usage
+h3. Check the [wiki](http://wiki.github.com/paraseba/cssgen/ for more usage)
 information.
 
 If you have a feature request, problem or comment, just drop me a line.
