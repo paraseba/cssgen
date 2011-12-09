@@ -1,5 +1,7 @@
 (ns test.cssgen
-  (:use cssgen clojure.test))
+  (:refer-clojure :exclude [+ - * /])
+  (:use cssgen clojure.test
+        clojure.algo.generic.arithmetic))
 
 (deftest simple-rules-test
   (are [the-rule result] (= result (css the-rule))
@@ -28,6 +30,13 @@
     [:.foo :border ["5px" :solid "red"]]
 ".foo {
   border: 5px solid red;
+}"))
+
+(deftest arithmetic
+  (are [the-rule result] (= result (css the-rule))
+    [:.foo :border (+ (px 1) (px 5))]
+".foo {
+  border: 6px;
 }"))
 
 (deftest sub-rules

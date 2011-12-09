@@ -1,8 +1,8 @@
 (ns test.operations
   (:refer-clojure :exclude [+ - * /])
-  (:use cssgen
-        clojure.test
-        [clojure.algo.generic.arithmetic :only (+ - * /)]))
+  (:use cssgen clojure.test
+        clojure.algo.generic.arithmetic))
+
 
 (def all-lengths [em ex px in cm mm pt pc % deg])
 
