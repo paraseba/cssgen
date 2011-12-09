@@ -20,11 +20,11 @@
 
 (load "types")
 
-(defn is-rule? [r]
+(defn- is-rule? [r]
   (and (map? r)
        (every? r [:selector :subrules :props])))
 
-(defn parse-rule
+(defn- parse-rule
   "Parse a rule returning a map of :subrules, :props and :selector.
   Subrules are parsed recursively. Does mixin expansion. A mixin is
   a seq, subrules are vectors, other elements are interpreted as
@@ -66,10 +66,10 @@
                 (rest (expand-mixins rule)))
       (update-in [:props] (partial partition-all 2)))))
 
-(def ^{:doc "Joins a sequence inserting newlines between elements"}
+(def ^{:doc "Joins a sequence inserting newlines between elements" :private true}
   in-lines (partial join "\n"))
 
-(defn indent
+(defn- indent
   "Indent the string s by 2n spaces"
   [n s]
   {:pre [(number? n) (string? s)]}
@@ -79,7 +79,7 @@
       (map #(str spacer %))
       in-lines)))
 
-(defn compile-properties
+(defn- compile-properties
   "Given a seq of seq pairs, generate CSS code.
   Example:
     (compile-properties '((:color :blue) (:width \"900px\")))"
@@ -91,7 +91,7 @@
            (format "%s: %s;" (to-css name) (to-css value))))
     in-lines))
 
-(defn selector-string
+(defn- selector-string
   "Generates the selector resulting of joining the parent and child
   selectors. Make & substitution and coma expansion. parent-selector
   and selector must be rule items (to-css will be called on them)."
@@ -109,14 +109,14 @@
           (for [p parents c children]
             (nest-selector (trim p) (trim c))))))
 
-(defn format-rule
+(defn- format-rule
   "Generate rule css given all the parts as strings"
   [selector props subrules tabs]
   {:pre [(every? string? [selector props subrules]) (number? tabs)]}
   (indent tabs
           (str selector " {\n" props "\n}" subrules)))
 
-(defn compile-rule
+(defn- compile-rule
   "Generate CSS string for a rule and its sub-rules"
   ([rule parent-selector tabs]
    {:pre  [(is-rule? rule) (>= tabs 0)]
