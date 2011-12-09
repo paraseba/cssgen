@@ -240,6 +240,7 @@ h2. Changes
 * 0.3.0-SNAPSHOT
 ** Dropped <code>rule</code> and <code>mixin</code> functions in favor of vectors and lists
 ** Dropped <code>css-ns</code>, you're on your own now
+** Dropped <code>css-file</code>, you're on your own now
 ** The only way to generate colors is using <code>rgb</code> function
 
 h2. ToDo
