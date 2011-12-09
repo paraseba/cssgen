@@ -19,8 +19,8 @@
 
 (defn rgb
   ([r g b]
-   {:pre [(every? integer? [r g b])] :post [(= Color (class %))]}
-   (letfn [(limit [x] (max 0 (min x 255)))]
+   {:pre [(every? number? [r g b])] :post [(= Color (class %))]}
+   (letfn [(limit [x] (max 0 (min (int x) 255)))]
      (Color. (limit r) (limit g) (limit b))))
   ([s]
    {:pre [(or (string? s) (keyword? s) (symbol? s))]
