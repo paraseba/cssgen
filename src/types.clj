@@ -83,9 +83,9 @@
 (compwise-col-col-op generic/* *)
 (generic/defmethod* generic / [Color Color]
   [{ra :r ga :g ba :b} {rb :r gb :g bb :b}]
-  (rgb ((generic/qsym generic /) ra rb)
-       ((generic/qsym generic /) ga gb)
-       ((generic/qsym generic /) ba bb)))
+  (rgb (/ ra rb)
+       (/ ga gb)
+       (/ ba bb)))
 
 (defmacro ^{:private true} compwise-col-num-op [sym f]
   (let [f f]
@@ -102,12 +102,12 @@
 (compwise-col-num-op generic/* *)
 (generic/defmethod* generic / [Color Number]
   [{r :r g :g b :b} num]
-  (rgb ((generic/qsym generic /) r num)
-       ((generic/qsym generic /) g num)
-       ((generic/qsym generic /) b num)))
+  (rgb (/ r num)
+       (/ g num)
+       (/ b num)))
 (generic/defmethod* generic / [Number Color]
   [num {r :r g :g b :b}]
-  (rgb ((generic/qsym generic /) num r)
-       ((generic/qsym generic /) num g)
-       ((generic/qsym generic /) num b)))
+  (rgb (/ num r)
+       (/ num g)
+       (/ num b)))
 
