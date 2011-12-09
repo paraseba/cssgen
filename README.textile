@@ -5,6 +5,8 @@ by writing clojure code.
 
 You can go "here":http://wiki.github.com/paraseba/cssgen/ to read more about cssgen.
 
+**Please take a look at the upcoming syntax in version 0.3.0, tell me what you think: "0.3.0-SNAPSHOT":https://github.com/paraseba/cssgen/tree/0.3.0**
+
 Using clojure instead of plain CSS you get a lot of benefices. You can use the full power of the language to do things
 like:
 
