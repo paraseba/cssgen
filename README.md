@@ -209,7 +209,6 @@ tree in cssgen.
 * Document
 * Command line interface
 
-### Check the [wiki](http://wiki.github.com/paraseba/cssgen/ for more usage)
-information.
+### Check the [wiki](http://wiki.github.com/paraseba/cssgen/) for more usage information.
 
 If you have a feature request, problem or comment, just drop me a line.
