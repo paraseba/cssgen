@@ -127,6 +127,40 @@
      (format-rule full-selector props-css subrules-css tabs)))
   ([rule] (compile-rule rule nil 0)))
 
+; -- let the hacking begin --
+
+; this approach doesn't work well
+;
+;(def arith-functions [+ - * /])
+;(def meta+ (meta #'+))
+;(def meta- (meta #'-))
+;(def meta* (meta #'*))
+;(def meta-div (meta #'/))
+;(def inline-keys [:inline :inline-arities])
+
+;(defn with-css-arithmetic* [f]
+  ;(with-redefs [+ generic/+ - generic/- * generic/* / (generic/qsym generic /)]
+    ;(f)))
+
+;(defmacro removing-inline [& body]
+  ;`(do
+     ;(apply alter-meta! #'+ dissoc inline-keys)
+     ;(apply alter-meta! #'- dissoc inline-keys)
+     ;(apply alter-meta! #'* dissoc inline-keys)
+     ;(apply alter-meta! #'/ dissoc inline-keys)
+     ;(try
+       ;(with-css-arithmetic* (fn [] ~@body))
+       ;(finally
+         ;(alter-meta! #'+ merge meta+)
+         ;(alter-meta! #'- merge meta-)
+         ;(alter-meta! #'* merge meta*)
+         ;(alter-meta! #'/ merge meta-div)))))
+
+;(defmacro with-css-arithmetic [& body]
+  ;`(removing-inline ~@body))
+
+; -- let the hacking end -
+
 (defn css
   "Generate CSS string for the rules and their sub-rules"
   [& rules]
