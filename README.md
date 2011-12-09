@@ -1,4 +1,4 @@
-h1. cssgen
+# cssgen
 
 A *clojure* library to generate *CSS* code using an embedded domain-specific
 language (EDSL). In plain words: generate CSS files by writing clojure code.
@@ -85,7 +85,7 @@ full power of the language to do things like:
 </pre>
 
 
-h2. Installation
+## Installation
 
 The easiest way to install cssgen is by using Leiningen. Just add the following
 dependency to your project.clj file:
@@ -96,7 +96,7 @@ dependency to your project.clj file:
 </code>
 </pre>
 
-h2. Usage
+## Usage
 
 I'll show some examples of use, but you should read the
 "wiki":http://wiki.github.com/paraseba/cssgen/ for more details and information.
@@ -236,14 +236,14 @@ vars) that return sequences. Those can later be used in other definitions
 </code>
 </pre>
 
-h2. Changes
+## Changes
 * 0.3.0-SNAPSHOT
 ** Dropped <code>rule</code> and <code>mixin</code> functions in favor of vectors and lists
 ** Dropped <code>css-ns</code>, you're on your own now
 ** Dropped <code>css-file</code>, you're on your own now
 ** The only way to generate colors is using <code>rgb</code> function
 
-h2. ToDo
+## ToDo
 
 * Watcher to re-generate css files if source changed ???
 * Property namespaces (font-*)
