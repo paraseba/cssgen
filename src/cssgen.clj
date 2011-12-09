@@ -55,9 +55,11 @@
         parse-item
           (fn ;"Parses a rule item, deciding if it's part of a property or a subrule
             [{:keys [props] :as rule} item]
-            (if (is-rule? props item)
-              (update-in rule [:subrules] conj (parse-rule item))
-              (update-in rule [:props] conj item)))]
+            (cond
+              (nil? item) rule
+              (is-rule? props item)
+                (update-in rule [:subrules] conj (parse-rule item))
+              :else (update-in rule [:props] conj item)))]
 
     (-> (reduce parse-item
                 {:subrules [] :props [] :selector (first rule)}

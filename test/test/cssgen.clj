@@ -25,6 +25,19 @@
   width: 400.5;
 }"))
 
+(deftest skip-nil-elements
+  (are [the-rule result] (= result (css the-rule))
+    [:a nil]
+"a {
+  
+}"
+    [:a :color :red nil :display :block]
+"a {
+  color: red;
+  display: block;
+}"))
+
+
 (deftest sequence-values
   (are [the-rule result] (= result (css the-rule))
     [:.foo :border ["5px" :solid "red"]]
