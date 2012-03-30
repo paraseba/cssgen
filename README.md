@@ -73,7 +73,7 @@ The easiest way to install cssgen is by using Leiningen. Just add the following
 dependency to your project.clj file:
 
 ```clojure
-[cssgen "0.3.0-SNAPSHOT"]
+[cssgen "0.3.0-alpha1"]
 ```
 
 ## Usage
