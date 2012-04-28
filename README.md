@@ -1,5 +1,8 @@
 # cssgen
 
+[![Build Status](https://secure.travis-ci.org/paraseba/cssgen.png)](http://travis-ci.org/paraseba/cssgen)
+
+
 A **clojure** library to generate **CSS** code using an embedded domain-specific
 language (EDSL). In plain words: generate CSS files by writing clojure code.
 
