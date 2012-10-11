@@ -143,7 +143,6 @@ tr td {
 }
 "))
 
-
 (deftest rule-sequence-formation
   (rule-seq
    (rule "a")

@@ -87,7 +87,9 @@
 (defn css-file [path & rules]
   (spit path (apply css rules)))
 
-(defmacro rule-seq [& rules]
+(defmacro rule-seq
+  "Group a sequence of rules into a vector named rule-sequence."
+  [& rules]
   (let [name 'rule-sequence]
     `(defonce ~name [~@rules])))
 
