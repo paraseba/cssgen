@@ -1,5 +1,6 @@
 (ns rules
-  (:use cssgen cssgen.types clojure.test))
+  (:use cssgen cssgen.types clojure.test)
+  (:import cssgen.Rule))
 
 (deftest single-prop-rules
   (are [the-rule result] (= result (css the-rule))
@@ -141,4 +142,13 @@ tr td {
   font-size: 2mm;
 }
 "))
+
+
+(deftest rule-sequence-formation
+  (rule-seq
+   (rule "a")
+   (rule "div"))  
+  (is (= [(Rule. "a" [] [])
+          (Rule. "div" [] [])]
+           rule-sequence)))
 

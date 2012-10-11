@@ -1,6 +1,7 @@
 /lib
 /classes
 /cssgen.jar
+/target
 /*.jar
 /pom.xml
 /multi-lib
