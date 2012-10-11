@@ -1,4 +1,4 @@
-(defproject cssgen "0.2.6"
+(defproject cssgen-rule-seq "0.2.7-SNAPSHOT"
   :description "Generate CSS from clojure code. Like an embedded sass."
   :url "http://github.com/paraseba/cssgen"
   :dependencies [[org.clojure/clojure "1.2.0"]
